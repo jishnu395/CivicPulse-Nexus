@@ -1,13 +1,13 @@
-# IntelliJ IDEA
+# IntelliJ
 .idea/
 *.iml
 
-# Maven build output
-**/target/
+# Build output
+target/
+out/
 
-# OS files
-.DS_Store
-Thumbs.db
+# Maven
+.mvn/wrapper/maven-wrapper.jar
 
 # Logs
 *.log
