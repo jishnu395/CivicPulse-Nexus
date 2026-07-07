@@ -6,9 +6,11 @@ import com.civicpulse.citizen.dto.request.UpdateCitizenRequest;
 import com.civicpulse.citizen.dto.response.CitizenResponse;
 import com.civicpulse.citizen.dto.response.UserResponse;
 import com.civicpulse.citizen.entity.Citizen;
+import com.civicpulse.citizen.event.CitizenCreatedEvent;
 import com.civicpulse.citizen.exception.CitizenNotFoundException;
 import com.civicpulse.citizen.exception.DuplicateCitizenException;
 import com.civicpulse.citizen.mapper.CitizenMapper;
+import com.civicpulse.citizen.producer.CitizenEventProducer;
 import com.civicpulse.citizen.repository.CitizenRepository;
 import com.civicpulse.citizen.service.interfaces.CitizenService;
 import com.civicpulse.citizen.util.enums.CitizenStatus;
@@ -24,6 +26,7 @@ public class CitizenServiceImpl implements CitizenService {
     private final CitizenRepository citizenRepository;
     private final CitizenMapper citizenMapper;
     private final UserClientService userClientService;
+    private final CitizenEventProducer citizenEventProducer;
 
     @Override
     public CitizenResponse registerCitizen(CreateCitizenRequest request) {
@@ -45,6 +48,19 @@ public class CitizenServiceImpl implements CitizenService {
         Citizen citizen = citizenMapper.toEntity(request, user.getEmail());
 
         Citizen savedCitizen = citizenRepository.save(citizen);
+
+        CitizenCreatedEvent event = CitizenCreatedEvent.builder()
+                .userId(savedCitizen.getUserId())
+                .citizenId(savedCitizen.getCitizenId())
+                .email(savedCitizen.getEmail())
+                .firstName(savedCitizen.getFirstName())
+                .lastName(savedCitizen.getLastName())
+                .phoneNumber(savedCitizen.getPhoneNumber())
+                .wardNumber(savedCitizen.getWardNumber())
+                .createdAt(savedCitizen.getCreatedAt())
+                .build();
+
+        citizenEventProducer.publishCitizenCreatedEvent(event);
 
         return citizenMapper.toResponse(savedCitizen);
     }
