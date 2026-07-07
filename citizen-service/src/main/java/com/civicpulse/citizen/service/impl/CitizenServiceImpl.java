@@ -6,6 +6,8 @@ import com.civicpulse.citizen.dto.request.UpdateCitizenRequest;
 import com.civicpulse.citizen.dto.response.CitizenResponse;
 import com.civicpulse.citizen.dto.response.UserResponse;
 import com.civicpulse.citizen.entity.Citizen;
+import com.civicpulse.citizen.exception.CitizenNotFoundException;
+import com.civicpulse.citizen.exception.DuplicateCitizenException;
 import com.civicpulse.citizen.mapper.CitizenMapper;
 import com.civicpulse.citizen.repository.CitizenRepository;
 import com.civicpulse.citizen.service.interfaces.CitizenService;
@@ -27,11 +29,15 @@ public class CitizenServiceImpl implements CitizenService {
     public CitizenResponse registerCitizen(CreateCitizenRequest request) {
 
         if (citizenRepository.existsByUserId(request.getUserId())) {
-            throw new RuntimeException("Citizen profile already exists for this user.");
+            throw new DuplicateCitizenException(
+                    "Citizen profile already exists for user ID: " + request.getUserId()
+            );
         }
 
         if (citizenRepository.existsByPhoneNumber(request.getPhoneNumber())) {
-            throw new RuntimeException("Phone number already exists.");
+            throw new DuplicateCitizenException(
+                    "Phone number already exists: " + request.getPhoneNumber()
+            );
         }
 
         UserResponse user = userClientService.getUser(request.getUserId());
@@ -47,7 +53,10 @@ public class CitizenServiceImpl implements CitizenService {
     public CitizenResponse getCitizenById(Long id) {
 
         Citizen citizen = citizenRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Citizen not found."));
+                .orElseThrow(() ->
+                        new CitizenNotFoundException(
+                                "Citizen with ID " + id + " not found."
+                        ));
 
         return citizenMapper.toResponse(citizen);
     }
@@ -66,7 +75,10 @@ public class CitizenServiceImpl implements CitizenService {
                                          UpdateCitizenRequest request) {
 
         Citizen citizen = citizenRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Citizen not found."));
+                .orElseThrow(() ->
+                        new CitizenNotFoundException(
+                                "Citizen with ID " + id + " not found."
+                        ));
 
         citizenMapper.updateEntity(citizen, request);
 
@@ -79,7 +91,10 @@ public class CitizenServiceImpl implements CitizenService {
     public void deleteCitizen(Long id) {
 
         Citizen citizen = citizenRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Citizen not found."));
+                .orElseThrow(() ->
+                        new CitizenNotFoundException(
+                                "Citizen with ID " + id + " not found."
+                        ));
 
         citizenRepository.delete(citizen);
     }
