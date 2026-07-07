@@ -1,4 +1,4 @@
-# CivicPulse Nexus
+# CivicPulse-Nexus
 
 <p align="center">
   <b>AI-Powered Smart Civic Grievance Management Platform</b><br>
