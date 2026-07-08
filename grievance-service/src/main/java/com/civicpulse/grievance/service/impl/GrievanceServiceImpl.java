@@ -6,10 +6,14 @@ import com.civicpulse.grievance.dto.UpdateGrievanceRequest;
 import com.civicpulse.grievance.entity.Grievance;
 import com.civicpulse.grievance.enums.GrievanceStatus;
 import com.civicpulse.grievance.exception.GrievanceNotFoundException;
+import com.civicpulse.grievance.feign.CitizenClient;
+import com.civicpulse.grievance.kafka.event.GrievanceCreatedEvent;
+import com.civicpulse.grievance.kafka.producer.GrievanceEventProducer;
 import com.civicpulse.grievance.mapper.GrievanceMapper;
 import com.civicpulse.grievance.repository.GrievanceRepository;
 import com.civicpulse.grievance.service.interfaces.GrievanceService;
 import com.civicpulse.grievance.util.SlaUtil;
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,9 +28,18 @@ public class GrievanceServiceImpl implements GrievanceService {
 
     private final GrievanceRepository grievanceRepository;
     private final GrievanceMapper grievanceMapper;
+    private final CitizenClient citizenClient;
+    private final GrievanceEventProducer grievanceEventProducer;
 
     @Override
     public GrievanceResponse createGrievance(CreateGrievanceRequest request) {
+
+        try {
+            citizenClient.getCitizenById(request.getCitizenId());
+        } catch (FeignException.NotFound ex) {
+            throw new GrievanceNotFoundException(
+                    "Citizen not found with id : " + request.getCitizenId());
+        }
 
         Grievance grievance = new Grievance();
 
@@ -46,6 +59,23 @@ public class GrievanceServiceImpl implements GrievanceService {
         grievance.setDueDate(SlaUtil.calculateDueDate(request.getPriority()));
 
         Grievance saved = grievanceRepository.save(grievance);
+
+        GrievanceCreatedEvent event = GrievanceCreatedEvent.builder()
+                .grievanceId(saved.getId())
+                .citizenId(saved.getCitizenId())
+                .title(saved.getTitle())
+                .category(saved.getCategory())
+                .priority(saved.getPriority())
+                .status(saved.getStatus())
+                .createdAt(saved.getCreatedAt())
+                .build();
+
+        try {
+            grievanceEventProducer.publishGrievanceCreatedEvent(event);
+        } catch (Exception ex) {
+            // TODO: Replace with proper logging (SLF4J) in production.
+            ex.printStackTrace();
+        }
 
         return grievanceMapper.toResponse(saved);
     }

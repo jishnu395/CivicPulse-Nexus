@@ -1,5 +1,6 @@
 package com.civicpulse.grievance.exception;
 
+import feign.FeignException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
@@ -53,6 +54,27 @@ public class GlobalExceptionHandler {
                 ex.getMessage(),
                 HttpStatus.BAD_REQUEST
         );
+    }
+
+    @ExceptionHandler({
+            FeignException.ServiceUnavailable.class,
+            FeignException.BadGateway.class,
+            FeignException.GatewayTimeout.class
+    })
+    public ResponseEntity<ErrorResponse> handleFeignUnavailable(
+            FeignException ex,
+            HttpServletRequest request) {
+
+        ErrorResponse response = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.SERVICE_UNAVAILABLE.value(),
+                "Service Unavailable",
+                "Citizen Service is currently unavailable.",
+                request.getRequestURI()
+        );
+
+        return new ResponseEntity<>(response,
+                HttpStatus.SERVICE_UNAVAILABLE);
     }
 
     @ExceptionHandler(Exception.class)
