@@ -93,4 +93,20 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response,
                 HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @ExceptionHandler(InvalidGrievanceStatusException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidStatus(
+            InvalidGrievanceStatusException ex,
+            HttpServletRequest request) {
+
+        ErrorResponse response = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                "Invalid Status Transition",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
 }

@@ -2,6 +2,7 @@ package com.civicpulse.grievance.dto;
 
 import com.civicpulse.grievance.enums.GrievanceStatus;
 import com.civicpulse.grievance.enums.Priority;
+import com.civicpulse.grievance.enums.SLAStatus;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -36,4 +37,6 @@ public class GrievanceResponse {
     private LocalDateTime dueDate;
 
     private LocalDateTime resolvedAt;
+
+    private SLAStatus slaStatus;
 }

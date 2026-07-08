@@ -1,10 +1,10 @@
 package com.civicpulse.grievance.controller;
 
-import com.civicpulse.grievance.dto.CreateGrievanceRequest;
-import com.civicpulse.grievance.dto.GrievanceResponse;
-import com.civicpulse.grievance.dto.UpdateGrievanceRequest;
+import com.civicpulse.grievance.dto.*;
+import com.civicpulse.grievance.service.interfaces.GrievanceHistoryService;
 import com.civicpulse.grievance.service.interfaces.GrievanceService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +26,7 @@ import java.util.List;
 public class GrievanceController {
 
     private final GrievanceService grievanceService;
+    private final GrievanceHistoryService grievanceHistoryService;
 
     @Operation(summary = "Create a new grievance")
     @PostMapping
@@ -77,5 +78,57 @@ public class GrievanceController {
 
         grievanceService.deleteGrievance(id);
         return ResponseEntity.ok("Grievance deleted successfully.");
+    }
+
+    @Operation(
+            summary = "Assign grievance",
+            description = "Assigns a grievance to a department and officer."
+    )
+    @ApiResponse(responseCode = "200", description = "Grievance assigned successfully")
+    @ApiResponse(responseCode = "404", description = "Grievance not found")
+    @PutMapping("/{id}/assign")
+    public ResponseEntity<GrievanceResponse> assignGrievance(
+            @PathVariable Long id,
+            @Valid @RequestBody AssignGrievanceRequest request) {
+
+        return ResponseEntity.ok(
+                grievanceService.assignGrievance(id, request));
+    }
+
+    @Operation(
+            summary = "Update grievance status",
+            description = "Updates grievance workflow status."
+    )
+    @ApiResponse(responseCode = "200", description = "Status updated successfully")
+    @ApiResponse(responseCode = "400", description = "Invalid status transition")
+    @ApiResponse(responseCode = "404", description = "Grievance not found")
+    @PutMapping("/{id}/status")
+    public ResponseEntity<GrievanceResponse> updateGrievanceStatus(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateGrievanceStatusRequest request) {
+
+        return ResponseEntity.ok(
+                grievanceService.updateGrievanceStatus(id, request));
+    }
+
+    @Operation(
+            summary = "Get grievance history",
+            description = "Returns the complete history timeline of a grievance."
+    )
+    @ApiResponse(responseCode = "200", description = "History retrieved successfully")
+    @ApiResponse(responseCode = "404", description = "Grievance not found")
+    @GetMapping("/{id}/history")
+    public ResponseEntity<List<GrievanceHistoryResponse>> getGrievanceHistory(
+            @PathVariable Long id) {
+
+        return ResponseEntity.ok(
+                grievanceHistoryService.getHistoryByGrievanceId(id));
+    }
+
+    @GetMapping("/dashboard")
+    public ResponseEntity<GrievanceDashboardResponse> getDashboard() {
+
+        return ResponseEntity.ok(
+                grievanceService.getDashboard());
     }
 }

@@ -9,6 +9,7 @@ public enum GrievanceStatus {
     RESOLVED,
     REJECTED,
     CLOSED,
-    ESCALATED
+    ESCALATED,
+    PENDING
 
 }

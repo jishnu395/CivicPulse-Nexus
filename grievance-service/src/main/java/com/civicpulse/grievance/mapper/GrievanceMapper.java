@@ -25,6 +25,7 @@ public class GrievanceMapper {
         response.setUpdatedAt(grievance.getUpdatedAt());
         response.setDueDate(grievance.getDueDate());
         response.setResolvedAt(grievance.getResolvedAt());
+        response.setSlaStatus(grievance.getSlaStatus());
 
         return response;
     }

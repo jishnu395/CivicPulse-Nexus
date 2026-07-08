@@ -1,8 +1,6 @@
 package com.civicpulse.grievance.service.interfaces;
 
-import com.civicpulse.grievance.dto.CreateGrievanceRequest;
-import com.civicpulse.grievance.dto.GrievanceResponse;
-import com.civicpulse.grievance.dto.UpdateGrievanceRequest;
+import com.civicpulse.grievance.dto.*;
 
 import java.util.List;
 
@@ -18,5 +16,11 @@ public interface GrievanceService {
 
     GrievanceResponse updateGrievance(Long id, UpdateGrievanceRequest request);
 
+    GrievanceResponse updateGrievanceStatus(Long grievanceId, UpdateGrievanceStatusRequest request);
+
     void deleteGrievance(Long id);
+
+    GrievanceResponse assignGrievance(Long grievanceId, AssignGrievanceRequest request);
+
+    GrievanceDashboardResponse getDashboard();
 }

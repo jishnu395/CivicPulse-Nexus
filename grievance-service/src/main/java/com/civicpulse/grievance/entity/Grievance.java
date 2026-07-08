@@ -2,6 +2,7 @@ package com.civicpulse.grievance.entity;
 
 import com.civicpulse.grievance.enums.GrievanceStatus;
 import com.civicpulse.grievance.enums.Priority;
+import com.civicpulse.grievance.enums.SLAStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -58,5 +59,9 @@ public class Grievance {
     private LocalDateTime dueDate;
 
     private LocalDateTime resolvedAt;
+
+
+    @Enumerated(EnumType.STRING)
+    private SLAStatus slaStatus;
 
 }
