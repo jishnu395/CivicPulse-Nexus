@@ -1,338 +1,345 @@
-# CivicPulse-Nexus
+# CivicPulse Nexus
 
-<p align="center">
-  <b>AI-Powered Smart Civic Grievance Management Platform</b><br>
-  Built using Spring Boot Microservices, Spring Cloud, PostgreSQL, Keycloak, OpenFeign, Kafka, and React.
-</p>
+CivicPulse Nexus is a cloud-native microservices-based civic grievance management platform designed to streamline complaint registration, assignment, tracking, SLA monitoring, and escalation for smart city governance.
 
----
-
-## 📌 Overview
-
-CivicPulse Nexus is a scalable microservices-based platform designed to modernize civic issue management by enabling citizens to register complaints, track grievance status, and interact with government departments efficiently.
-
-The system follows an event-driven microservice architecture using Spring Cloud, Eureka Discovery, API Gateway, OpenFeign for synchronous communication, and Kafka for asynchronous messaging (planned).
+The system follows a scalable microservices architecture using Spring Boot, Spring Cloud, Kafka, PostgreSQL, Keycloak, and React.
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ```
-                           React Frontend (Planned)
-                                   │
-                           Spring Cloud Gateway
-                                   │
-        ┌──────────────────────────┼──────────────────────────┐
-        │                          │                          │
-   User Service             Citizen Service          Grievance Service (Planned)
-        │                          │
-        │<────── OpenFeign ───────>│
-        │                          │
- PostgreSQL (user_db)       PostgreSQL (citizen_db)
+                +----------------------+
+                |     React Frontend   |
+                +----------+-----------+
+                           |
+                     API Gateway
+                           |
+        ---------------------------------------
+        |            |             |          |
+   User Service  Citizen Service  Grievance Service
+        |            |             |
+        ----------- PostgreSQL Databases ---------
 
-                    Eureka Discovery Server
+                    |
+               Eureka Discovery
 
-                 Kafka (Planned)
-      ├── Citizen Registered Event
-      ├── Citizen Updated Event
-      ├── Grievance Created Event
-      └── Grievance Assigned Event
+                    |
+                  Kafka
 ```
 
 ---
 
-# 🚀 Tech Stack
+# Tech Stack
 
-### Backend
+## Backend
 
-- Java 17
-- Spring Boot 4
-- Spring Cloud
+- Java 21
+- Spring Boot 3
 - Spring Data JPA
-- Spring Validation
-- OpenFeign
-- PostgreSQL
-- Keycloak IAM
-- Eureka Discovery
+- Spring Security
 - Spring Cloud Gateway
-- Lombok
+- Eureka Discovery Server
+- OpenFeign
+- Spring Kafka
+- PostgreSQL
+- Hibernate
+- Maven
 
-### Planned
+## Authentication
+
+- Keycloak
+
+## Messaging
 
 - Apache Kafka
-- Redis
-- Swagger/OpenAPI
-- Docker
+
+## Documentation
+
+- Swagger / OpenAPI
+
+## Frontend (Upcoming)
+
 - React
-- JWT Role-Based Security
+- Material UI
+- Axios
 
 ---
 
-# 📂 Project Structure
+# Microservices
 
-```
-civicpulse-nexus/
+## User Service
 
-├── discovery-server/
-├── gateway-service/
-├── user-service/
-├── citizen-service/
-└── grievance-service (Planned)
-```
-
----
-
-# ✅ Current Progress
-
-## Infrastructure
-
-- [x] Eureka Discovery Server
-- [x] Spring Cloud Gateway
-- [x] PostgreSQL Databases
-- [x] Keycloak Realm Configuration
-
----
-
-# 👤 User Service
-
-Responsible for authentication and user management.
+Responsible for user management and authentication.
 
 ### Features
 
 - User Registration
+- User Management
 - Keycloak Integration
-- User Persistence
-- Get User by ID API
-
-### Database
-
-```
-users
-```
-
-### APIs
-
-| Method | Endpoint | Status |
-|---------|----------|--------|
-| POST | `/api/auth/register` | ✅ |
-| GET | `/api/users/{id}` | ✅ |
+- PostgreSQL Persistence
 
 ---
 
-# 👥 Citizen Service
+## Citizen Service
 
 Responsible for citizen profile management.
 
 ### Features
 
 - Citizen Registration
-- Get Citizen by ID
-- Get All Citizens
-- Update Citizen
-- Delete Citizen
-- Search by Ward
-- Search by Status
-- OpenFeign Integration with User Service
-
-### Database
-
-```
-citizens
-```
-
-### APIs
-
-| Method | Endpoint | Status |
-|---------|----------|--------|
-| POST | `/api/citizens` | ✅ |
-| GET | `/api/citizens` | ✅ |
-| GET | `/api/citizens/{id}` | ✅ |
-| PUT | `/api/citizens/{id}` | ✅ |
-| DELETE | `/api/citizens/{id}` | ✅ |
-| GET | `/api/citizens/ward/{ward}` | ✅ |
-| GET | `/api/citizens/status/{status}` | ✅ |
-
----
-
-# 🔄 Current Registration Flow
-
-### Step 1 – User Registration
-
-```
-Client
-   │
-   ▼
-User Service
-   │
-   ▼
-Keycloak
-   │
-   ▼
-PostgreSQL (user_db)
-```
-
-A user account is created in both Keycloak and the User Service database.
-
----
-
-### Step 2 – Citizen Profile Registration
-
-```
-Client
-    │
-    ▼
-Citizen Service
-    │
-    ▼
-OpenFeign
-    │
-    ▼
-User Service
-    │
-Returns Email
-    │
-    ▼
-Citizen Service
-    │
-    ▼
-PostgreSQL (citizen_db)
-```
-
-The Citizen Service retrieves the user's email from the User Service using OpenFeign before creating the citizen profile.
-
----
-
-# 🔗 Microservice Communication
-
-Implemented using **Spring Cloud OpenFeign**.
-
-```
-Citizen Service
-        │
-        ▼
-User Service
-```
-
-No hardcoded URLs are used.
-
-Service discovery is handled by Eureka.
-
----
-
-# 🗄️ Databases
-
-### user_db
-
-```
-users
-```
-
-Stores
-
-- User ID
-- Keycloak ID
-- Email
-- Role
-- Status
-
----
-
-### citizen_db
-
-```
-citizens
-```
-
-Stores
-
-- Citizen ID
-- User ID
-- Name
-- Email
-- Phone
-- Gender
-- Date of Birth
-- Address
-- Ward
-- City
-- State
-- Postal Code
-- Status
-
----
-
-# 📌 Features Implemented
-
-- Microservice Architecture
-- Service Discovery
-- API Gateway
-- Keycloak Integration
-- PostgreSQL Integration
-- OpenFeign Communication
-- DTO Mapping
-- Bean Validation
-- Layered Architecture
-- Repository Pattern
-
----
-
-# 🚧 Upcoming Features
-
-## Citizen Service
-
-- Global Exception Handling
-- Custom Exceptions
-- Swagger/OpenAPI Documentation
-- Kafka Event Publishing
-- JWT Role-Based Security
+- Citizen CRUD
+- User Validation
+- PostgreSQL Persistence
 
 ---
 
 ## Grievance Service
 
-- Complaint Registration
-- Complaint Tracking
-- Assignment Workflow
-- Escalation Workflow
+Responsible for complete grievance lifecycle management.
+
+### Features
+
+### Complaint Management
+
+- Create Complaint
+- Update Complaint
+- View Complaint
+- Delete Complaint
+
+### Assignment Workflow
+
+- Assign Department
+- Assign Officer
+
+### Status Workflow
+
+- SUBMITTED
+- ASSIGNED
+- IN_PROGRESS
+- RESOLVED
+- CLOSED
+- ESCALATED
+
+### Status Transition Validation
+
+Invalid workflow transitions are prevented.
+
+Example:
+
+```
+SUBMITTED
+    ↓
+ASSIGNED
+    ↓
+IN_PROGRESS
+    ↓
+RESOLVED
+    ↓
+CLOSED
+```
+
+---
+
+### SLA Management
+
+Automatic due date calculation based on priority.
+
+| Priority | SLA |
+|----------|------|
+| HIGH | 1 Day |
+| MEDIUM | 3 Days |
+| LOW | 7 Days |
+
+SLA Status
+
+- WITHIN_SLA
+- NEAR_DEADLINE
+- OVERDUE
+
+---
+
+### Automatic Escalation
+
+A scheduler periodically checks overdue grievances.
+
+If SLA is breached:
+
+- Complaint status changes to ESCALATED
+- SLA Status becomes OVERDUE
+- History entry is created
+- Kafka event is published
+
+---
+
+### Complaint History
+
+Every important action is stored.
+
+Example
+
+```
+Complaint Submitted
+
+↓
+
+Assigned
+
+↓
+
+In Progress
+
+↓
+
+Resolved
+
+↓
+
+Closed
+
+↓
+
+Escalated (if overdue)
+```
+
+---
+
+### Dashboard
+
+Dashboard API provides:
+
+- Total Complaints
+- Submitted
+- Assigned
+- In Progress
+- Resolved
+- Closed
+- Escalated
+- Overdue
+
+---
+
+### Kafka Events
+
+The Grievance Service publishes the following events:
+
+- grievance-created
+- grievance-assigned
+- grievance-status-updated
+- grievance-escalated
+
+---
+
+# Service Communication
+
+OpenFeign is used for inter-service communication.
+
+Current integrations
+
+- Grievance Service → Citizen Service
+
+---
+
+# API Documentation
+
+Swagger UI
+
+```
+http://localhost:8083/swagger-ui/index.html
+```
+
+---
+
+# Project Structure
+
+```
+CivicPulse-Nexus
+│
+├── discovery-server
+├── api-gateway
+├── user-service
+├── citizen-service
+├── grievance-service
+│
+└── frontend (Upcoming)
+```
+
+---
+
+# Running the Project
+
+## Prerequisites
+
+- Java 21
+- Maven
+- PostgreSQL
+- Apache Kafka
+- Keycloak
+
+---
+
+## Start Order
+
+1. PostgreSQL
+2. Kafka
+3. Keycloak
+4. Discovery Server
+5. API Gateway
+6. User Service
+7. Citizen Service
+8. Grievance Service
+
+---
+
+# Current Progress
+
+## Completed
+
+- Infrastructure Setup
+- Eureka Discovery
+- API Gateway
+- PostgreSQL Integration
+- Keycloak Authentication
+- User Service
+- Citizen Service
+- Grievance CRUD
+- Validation
+- Global Exception Handling
+- Swagger
+- OpenFeign Integration
+- Kafka Producers
+- Complaint Assignment
+- Status Workflow
+- Status Validation
 - SLA Monitoring
-- Kafka Consumer
-- Kafka Producer
+- Automatic Escalation
+- Complaint History
+- Dashboard API
 
 ---
 
-## Platform
+# Upcoming Features
 
-- Redis Caching
-- Docker Support
-- Frontend (React)
-- Admin Dashboard
-- Notifications
-- AI-Powered Complaint Classification
-
----
-
-# 📈 Development Status
-
-| Module | Status |
-|---------|--------|
-| Discovery Server | ✅ Complete |
-| API Gateway | ✅ Complete |
-| User Service | ✅ Complete (Milestone 1 Foundation) |
-| Citizen Service | 🟡 Core Functionality Complete |
-| Kafka Integration | ⏳ Planned |
-| Security | ⏳ Planned |
-| Swagger | ⏳ Planned |
-| Grievance Service | ⏳ Planned |
-| Frontend | ⏳ Planned |
+- Officer Service
+- Notification Service
+- React Frontend
+- Email Notifications
+- Analytics Dashboard
+- Docker Deployment
+- Kubernetes Deployment
 
 ---
 
-# 👨‍💻 Author
+# Author
 
 **Jishnu V**
-
-Backend-focused Software Engineer passionate about building scalable Spring Boot microservices and distributed systems.
 
 GitHub: https://github.com/jishnu395
 
 LinkedIn: https://www.linkedin.com/in/jishnu-v-3119462a4/
+
+---
+
+# License
+
+This project is developed for educational and portfolio purposes.
