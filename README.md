@@ -1,214 +1,179 @@
-# CivicPulse Nexus
+# CivicPulse Nexus - Frontend
 
-CivicPulse Nexus is a cloud-native microservices-based civic grievance management platform designed to streamline complaint registration, assignment, tracking, SLA monitoring, and escalation for smart city governance.
+A React-based frontend for **CivicPulse Nexus**, a Smart City Grievance Management System built using a **Microservices Architecture**.
 
-The system follows a scalable microservices architecture using Spring Boot, Spring Cloud, Kafka, PostgreSQL, Keycloak, and React.
-
----
-
-## Architecture
-
-```
-                +----------------------+
-                |     React Frontend   |
-                +----------+-----------+
-                           |
-                     API Gateway
-                           |
-        ---------------------------------------
-        |            |             |          |
-   User Service  Citizen Service  Grievance Service
-        |            |             |
-        ----------- PostgreSQL Databases ---------
-
-                    |
-               Eureka Discovery
-
-                    |
-                  Kafka
-```
+This frontend interacts with the Citizen Service and Grievance Service to provide a simple interface for managing citizens, grievances, and dashboard statistics.
 
 ---
 
-# Tech Stack
+## 🚀 Features
 
-## Backend
+- Login Page (UI)
+- Home Dashboard
+- Register Citizen
+- View Citizens
+- Register Grievance
+- View Grievances
+- Dashboard Statistics
+- React Router Navigation
+- Material UI Components
+- Axios API Integration
+- Responsive Layout
 
-- Java 21
-- Spring Boot 3
-- Spring Data JPA
-- Spring Security
-- Spring Cloud Gateway
-- Eureka Discovery Server
-- OpenFeign
-- Spring Kafka
-- PostgreSQL
-- Hibernate
-- Maven
+---
 
-## Authentication
+## 🏗️ Tech Stack
 
-- Keycloak
-
-## Messaging
-
-- Apache Kafka
-
-## Documentation
-
-- Swagger / OpenAPI
-
-## Frontend (Upcoming)
-
-- React
+- React (Vite)
+- React Router DOM
 - Material UI
 - Axios
+- JavaScript
+- CSS
 
 ---
 
-# Microservices
-
-## User Service
-
-Responsible for user management and authentication.
-
-### Features
-
-- User Registration
-- User Management
-- Keycloak Integration
-- PostgreSQL Persistence
-
----
-
-## Citizen Service
-
-Responsible for citizen profile management.
-
-### Features
-
-- Citizen Registration
-- Citizen CRUD
-- User Validation
-- PostgreSQL Persistence
-
----
-
-## Grievance Service
-
-Responsible for complete grievance lifecycle management.
-
-### Features
-
-### Complaint Management
-
-- Create Complaint
-- Update Complaint
-- View Complaint
-- Delete Complaint
-
-### Assignment Workflow
-
-- Assign Department
-- Assign Officer
-
-### Status Workflow
-
-- SUBMITTED
-- ASSIGNED
-- IN_PROGRESS
-- RESOLVED
-- CLOSED
-- ESCALATED
-
-### Status Transition Validation
-
-Invalid workflow transitions are prevented.
-
-Example:
+## 📂 Project Structure
 
 ```
-SUBMITTED
-    ↓
-ASSIGNED
-    ↓
-IN_PROGRESS
-    ↓
-RESOLVED
-    ↓
-CLOSED
+src/
+│
+├── pages/
+│   ├── Login.jsx
+│   ├── Home.jsx
+│   ├── RegisterCitizen.jsx
+│   ├── CitizenList.jsx
+│   ├── RegisterGrievance.jsx
+│   ├── GrievanceList.jsx
+│   ├── Dashboard.jsx
+│   └── GrievanceHistory.jsx
+│
+├── routes/
+│   └── AppRoutes.jsx
+│
+├── services/
+│   └── api.js
+│
+├── App.jsx
+└── main.jsx
 ```
 
 ---
 
-### SLA Management
+## 🌐 Backend Services
 
-Automatic due date calculation based on priority.
+The frontend communicates with the following backend services.
 
-| Priority | SLA |
+| Service | Port |
 |----------|------|
-| HIGH | 1 Day |
-| MEDIUM | 3 Days |
-| LOW | 7 Days |
+| Citizen Service | 8082 |
+| Grievance Service | 8083 |
 
-SLA Status
+Axios configuration:
 
-- WITHIN_SLA
-- NEAR_DEADLINE
-- OVERDUE
+```javascript
+export const citizenAPI = axios.create({
+    baseURL: "http://localhost:8082/api/citizens"
+});
+
+export const grievanceAPI = axios.create({
+    baseURL: "http://localhost:8083/api/grievances"
+});
+```
 
 ---
 
-### Automatic Escalation
+## 📋 Available Pages
 
-A scheduler periodically checks overdue grievances.
+### Login
 
-If SLA is breached:
-
-- Complaint status changes to ESCALATED
-- SLA Status becomes OVERDUE
-- History entry is created
-- Kafka event is published
+Simple login interface for CivicPulse Nexus.
 
 ---
 
-### Complaint History
+### Home
 
-Every important action is stored.
+Provides navigation to all available modules.
 
-Example
+- Register Citizen
+- View Citizens
+- Register Grievance
+- View Grievances
+- Dashboard
 
-```
-Complaint Submitted
+---
 
-↓
+### Register Citizen
 
-Assigned
+Allows creation of a citizen profile linked to an existing registered user.
 
-↓
+Fields:
 
-In Progress
+- User ID
+- First Name
+- Last Name
+- Phone Number
+- Gender
+- Date of Birth
+- Address
+- Ward Number
+- City
+- State
+- Postal Code
 
-↓
+---
 
-Resolved
+### View Citizens
 
-↓
+Displays all registered citizens in a Material UI table.
 
-Closed
+Columns:
 
-↓
+- ID
+- Citizen ID
+- Name
+- Phone Number
+- Ward
+- Status
 
-Escalated (if overdue)
-```
+---
+
+### Register Grievance
+
+Creates a new grievance.
+
+Fields:
+
+- Citizen ID
+- Title
+- Description
+- Category
+- Location
+- Priority
+
+---
+
+### View Grievances
+
+Displays all grievances.
+
+Columns:
+
+- ID
+- Citizen ID
+- Title
+- Category
+- Priority
+- Status
+- SLA Status
 
 ---
 
 ### Dashboard
 
-Dashboard API provides:
+Displays grievance statistics.
 
-- Total Complaints
+- Total
 - Submitted
 - Assigned
 - In Progress
@@ -219,127 +184,76 @@ Dashboard API provides:
 
 ---
 
-### Kafka Events
+## ▶️ Getting Started
 
-The Grievance Service publishes the following events:
+Clone the repository
 
-- grievance-created
-- grievance-assigned
-- grievance-status-updated
-- grievance-escalated
-
----
-
-# Service Communication
-
-OpenFeign is used for inter-service communication.
-
-Current integrations
-
-- Grievance Service → Citizen Service
-
----
-
-# API Documentation
-
-Swagger UI
-
-```
-http://localhost:8083/swagger-ui/index.html
+```bash
+git clone <repository-url>
 ```
 
----
+Navigate into the project
 
-# Project Structure
+```bash
+cd civicpulse-frontend
+```
+
+Install dependencies
+
+```bash
+npm install
+```
+
+Run the application
+
+```bash
+npm run dev
+```
+
+Application runs at
 
 ```
-CivicPulse-Nexus
-│
-├── discovery-server
-├── api-gateway
-├── user-service
-├── citizen-service
-├── grievance-service
-│
-└── frontend (Upcoming)
+http://localhost:5173
 ```
 
 ---
 
-# Running the Project
+## ⚙️ Prerequisites
 
-## Prerequisites
+Ensure the following services are running:
 
-- Java 21
-- Maven
 - PostgreSQL
-- Apache Kafka
+- Eureka Discovery Server
+- API Gateway
+- User Service
+- Citizen Service
+- Grievance Service
+- Kafka
 - Keycloak
 
 ---
 
-## Start Order
+## 📌 Future Enhancements
 
-1. PostgreSQL
-2. Kafka
-3. Keycloak
-4. Discovery Server
-5. API Gateway
-6. User Service
-7. Citizen Service
-8. Grievance Service
-
----
-
-# Current Progress
-
-## Completed
-
-- Infrastructure Setup
-- Eureka Discovery
-- API Gateway
-- PostgreSQL Integration
-- Keycloak Authentication
-- User Service
-- Citizen Service
-- Grievance CRUD
-- Validation
-- Global Exception Handling
-- Swagger
-- OpenFeign Integration
-- Kafka Producers
-- Complaint Assignment
-- Status Workflow
-- Status Validation
-- SLA Monitoring
-- Automatic Escalation
-- Complaint History
-- Dashboard API
+- JWT Authentication using Keycloak
+- Role-Based Access Control
+- Officer Dashboard
+- Department Management
+- Notification Module
+- Complaint Tracking Timeline
+- File Upload Support
+- Search & Filtering
+- Pagination
+- Responsive Dashboard Charts
 
 ---
 
-# Upcoming Features
-
-- Officer Service
-- Notification Service
-- React Frontend
-- Email Notifications
-- Analytics Dashboard
-- Docker Deployment
-- Kubernetes Deployment
-
----
-
-# Author
+## 👨‍💻 Developed By
 
 **Jishnu V**
 
-GitHub: https://github.com/jishnu395
+Computer Science Engineering Student
 
-LinkedIn: https://www.linkedin.com/in/jishnu-v-3119462a4/
+Spring Boot | React | Microservices | Java
 
 ---
-
-# License
-
-This project is developed for educational and portfolio purposes.
