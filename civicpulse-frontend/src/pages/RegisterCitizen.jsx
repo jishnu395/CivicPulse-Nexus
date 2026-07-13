@@ -145,9 +145,9 @@ export default function RegisterCitizen() {
                         name="dateOfBirth"
                         value={citizen.dateOfBirth}
                         onChange={handleChange}
-                        inputProps={{
-                            max: new Date().toISOString().split("T")[0]
-                        }}
+                        // inputProps={{
+                        //     max: new Date().toISOString().split("T")[0]
+                        // }}
                     />
 
                     <TextField

@@ -112,7 +112,8 @@ public class CitizenServiceImpl implements CitizenService {
                                 "Citizen with ID " + id + " not found."
                         ));
 
-        citizenRepository.delete(citizen);
+        citizen.setStatus(CitizenStatus.INACTIVE);
+        citizenRepository.save(citizen);
     }
 
     @Override

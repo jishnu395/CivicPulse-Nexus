@@ -1,6 +1,8 @@
 package com.civicpulse.user.entity;
 
 
+import com.civicpulse.user.enums.Role;
+import com.civicpulse.user.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,11 +28,12 @@ public class User {
     private String email;
 
     @Column(nullable = false)
-    private String role;
-
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     @Column(nullable = false)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private UserStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

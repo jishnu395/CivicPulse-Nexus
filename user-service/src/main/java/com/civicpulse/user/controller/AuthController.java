@@ -1,5 +1,7 @@
 package com.civicpulse.user.controller;
 
+import com.civicpulse.user.dto.LoginRequest;
+import com.civicpulse.user.dto.LoginResponse;
 import com.civicpulse.user.dto.RegisterRequest;
 import com.civicpulse.user.dto.RegisterResponse;
 import com.civicpulse.user.service.AuthService;
@@ -17,13 +19,21 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<RegisterResponse> register(
-            @Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<RegisterResponse> register(@Valid @RequestBody RegisterRequest request) {
 
         RegisterResponse response = authService.register(request);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(response);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> login(
+            @RequestBody @Valid LoginRequest request) {
+
+        return ResponseEntity.ok(
+                authService.login(request)
+        );
     }
 }

@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RegisterResponse {
+public class UserResponse {
 
     private Long id;
 
@@ -20,6 +20,4 @@ public class RegisterResponse {
     private Role role;
 
     private UserStatus status;
-
-    private String message;
 }

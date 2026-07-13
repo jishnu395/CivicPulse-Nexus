@@ -1,14 +1,18 @@
 package com.civicpulse.user.service.impl;
 
+import com.civicpulse.user.enums.Role;
 import com.civicpulse.user.service.KeycloakService;
 import lombok.RequiredArgsConstructor;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.representations.idm.CredentialRepresentation;
+import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import jakarta.ws.rs.core.Response;
+
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -21,7 +25,7 @@ public class KeycloakServiceImpl implements KeycloakService {
     private String realm;
 
     @Override
-    public String createUser(String email, String password, String role) {
+    public String createUser(String email, String password, Role role) {
 
         try {
 
@@ -29,11 +33,13 @@ public class KeycloakServiceImpl implements KeycloakService {
             user.setEnabled(true);
             user.setUsername(email);
             user.setEmail(email);
+            user.setEmailVerified(true);
 
             CredentialRepresentation credential = new CredentialRepresentation();
             credential.setType(CredentialRepresentation.PASSWORD);
             credential.setValue(password);
             credential.setTemporary(false);
+            user.setRequiredActions(Collections.emptyList());
 
             user.setCredentials(List.of(credential));
 
@@ -57,6 +63,19 @@ public class KeycloakServiceImpl implements KeycloakService {
 
             String location = response.getLocation().getPath();
             String userId = location.substring(location.lastIndexOf("/") + 1);
+
+            RoleRepresentation roleRepresentation =
+                    keycloak.realm(realm)
+                            .roles()
+                            .get(role.name())
+                            .toRepresentation();
+
+            keycloak.realm(realm)
+                    .users()
+                    .get(userId)
+                    .roles()
+                    .realmLevel()
+                    .add(List.of(roleRepresentation));
 
             System.out.println("User created successfully!");
             System.out.println("Keycloak User ID : " + userId);

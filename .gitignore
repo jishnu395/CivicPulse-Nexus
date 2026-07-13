@@ -11,3 +11,19 @@ out/
 
 # Logs
 *.log
+
+# IntelliJ
+.idea/
+
+# VS Code
+.vscode/
+
+# Build
+target/
+out/
+
+# Environment
+.env
+
+# Application properties (contains passwords/secrets)
+**/application.properties
