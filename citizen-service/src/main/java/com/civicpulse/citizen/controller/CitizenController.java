@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -35,6 +36,7 @@ public class CitizenController {
     @ApiResponse(responseCode = "201", description = "Citizen registered successfully")
     @ApiResponse(responseCode = "400", description = "Invalid request")
     @ApiResponse(responseCode = "409", description = "Citizen already exists")
+    @PreAuthorize("hasRole('CITIZEN')")
     @PostMapping
     public ResponseEntity<CitizenResponse> registerCitizen(
             @Valid @RequestBody CreateCitizenRequest request) {
@@ -51,6 +53,7 @@ public class CitizenController {
     )
     @ApiResponse(responseCode = "200", description = "Citizen found")
     @ApiResponse(responseCode = "404", description = "Citizen not found")
+    @PreAuthorize("hasAnyRole('ADMIN','OFFICER','COMMISSIONER','CITIZEN')")
     @GetMapping("/{id}")
     public ResponseEntity<CitizenResponse> getCitizenById(
             @Parameter(description = "Citizen database ID")
@@ -65,6 +68,7 @@ public class CitizenController {
             description = "Returns a list of all registered citizens."
     )
     @ApiResponse(responseCode = "200", description = "Citizens retrieved successfully")
+    @PreAuthorize("hasAnyRole('ADMIN','OFFICER','COMMISSIONER')")
     @GetMapping
     public ResponseEntity<List<CitizenResponse>> getAllCitizens() {
 
@@ -78,6 +82,7 @@ public class CitizenController {
     )
     @ApiResponse(responseCode = "200", description = "Citizen updated successfully")
     @ApiResponse(responseCode = "404", description = "Citizen not found")
+    @PreAuthorize("hasAnyRole('ADMIN','OFFICER','CITIZEN')")
     @PutMapping("/{id}")
     public ResponseEntity<CitizenResponse> updateCitizen(
             @Parameter(description = "Citizen database ID")
@@ -94,6 +99,7 @@ public class CitizenController {
     )
     @ApiResponse(responseCode = "204", description = "Citizen deleted successfully")
     @ApiResponse(responseCode = "404", description = "Citizen not found")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCitizen(
             @Parameter(description = "Citizen database ID")
@@ -109,6 +115,7 @@ public class CitizenController {
             description = "Returns all citizens belonging to a ward."
     )
     @ApiResponse(responseCode = "200", description = "Citizens retrieved successfully")
+    @PreAuthorize("hasAnyRole('ADMIN','OFFICER','COMMISSIONER')")
     @GetMapping("/ward/{wardNumber}")
     public ResponseEntity<List<CitizenResponse>> getCitizensByWard(
             @Parameter(description = "Ward number")
@@ -123,6 +130,7 @@ public class CitizenController {
             description = "Returns all citizens filtered by status."
     )
     @ApiResponse(responseCode = "200", description = "Citizens retrieved successfully")
+    @PreAuthorize("hasAnyRole('ADMIN','OFFICER','COMMISSIONER')")
     @GetMapping("/status/{status}")
     public ResponseEntity<List<CitizenResponse>> getCitizensByStatus(
             @Parameter(description = "Citizen status (ACTIVE, INACTIVE)")

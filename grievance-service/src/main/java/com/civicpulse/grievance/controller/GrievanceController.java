@@ -1,6 +1,7 @@
 package com.civicpulse.grievance.controller;
 
 import com.civicpulse.grievance.dto.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 import com.civicpulse.grievance.service.interfaces.GrievanceHistoryService;
 import com.civicpulse.grievance.service.interfaces.GrievanceService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,6 +30,7 @@ public class GrievanceController {
     private final GrievanceHistoryService grievanceHistoryService;
 
     @Operation(summary = "Create a new grievance")
+    @PreAuthorize("hasRole('CITIZEN')")
     @PostMapping
     public ResponseEntity<GrievanceResponse> createGrievance(
             @Valid @RequestBody CreateGrievanceRequest request) {
@@ -38,6 +40,7 @@ public class GrievanceController {
     }
 
     @Operation(summary = "Get all grievances")
+    @PreAuthorize("hasAnyRole('ADMIN','OFFICER','COMMISSIONER','CITIZEN')")
     @GetMapping
     public ResponseEntity<List<GrievanceResponse>> getAllGrievances() {
 
@@ -45,6 +48,7 @@ public class GrievanceController {
     }
 
     @Operation(summary = "Get grievance by ID")
+    @PreAuthorize("hasAnyRole('ADMIN','OFFICER','COMMISSIONER','CITIZEN')")
     @GetMapping("/{id}")
     public ResponseEntity<GrievanceResponse> getGrievanceById(
             @PathVariable Long id) {
@@ -53,6 +57,7 @@ public class GrievanceController {
     }
 
     @Operation(summary = "Get grievances by Citizen ID")
+    @PreAuthorize("hasAnyRole('ADMIN','OFFICER','COMMISSIONER','CITIZEN')")
     @GetMapping("/citizen/{citizenId}")
     public ResponseEntity<List<GrievanceResponse>> getGrievancesByCitizenId(
             @PathVariable Long citizenId) {
@@ -62,6 +67,7 @@ public class GrievanceController {
     }
 
     @Operation(summary = "Update grievance")
+    @PreAuthorize("hasAnyRole('ADMIN','OFFICER')")
     @PutMapping("/{id}")
     public ResponseEntity<GrievanceResponse> updateGrievance(
             @PathVariable Long id,
@@ -72,6 +78,7 @@ public class GrievanceController {
     }
 
     @Operation(summary = "Delete grievance")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteGrievance(
             @PathVariable Long id) {
@@ -86,6 +93,7 @@ public class GrievanceController {
     )
     @ApiResponse(responseCode = "200", description = "Grievance assigned successfully")
     @ApiResponse(responseCode = "404", description = "Grievance not found")
+    @PreAuthorize("hasAnyRole('ADMIN','COMMISSIONER')")
     @PutMapping("/{id}/assign")
     public ResponseEntity<GrievanceResponse> assignGrievance(
             @PathVariable Long id,
@@ -102,6 +110,7 @@ public class GrievanceController {
     @ApiResponse(responseCode = "200", description = "Status updated successfully")
     @ApiResponse(responseCode = "400", description = "Invalid status transition")
     @ApiResponse(responseCode = "404", description = "Grievance not found")
+    @PreAuthorize("hasAnyRole('ADMIN','OFFICER','COMMISSIONER')")
     @PutMapping("/{id}/status")
     public ResponseEntity<GrievanceResponse> updateGrievanceStatus(
             @PathVariable Long id,
@@ -117,6 +126,7 @@ public class GrievanceController {
     )
     @ApiResponse(responseCode = "200", description = "History retrieved successfully")
     @ApiResponse(responseCode = "404", description = "Grievance not found")
+    @PreAuthorize("hasAnyRole('ADMIN','OFFICER','COMMISSIONER','CITIZEN')")
     @GetMapping("/{id}/history")
     public ResponseEntity<List<GrievanceHistoryResponse>> getGrievanceHistory(
             @PathVariable Long id) {
@@ -125,6 +135,8 @@ public class GrievanceController {
                 grievanceHistoryService.getHistoryByGrievanceId(id));
     }
 
+    @Operation(summary = "Dashboard")
+    @PreAuthorize("hasAnyRole('ADMIN','COMMISSIONER')")
     @GetMapping("/dashboard")
     public ResponseEntity<GrievanceDashboardResponse> getDashboard() {
 
