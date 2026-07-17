@@ -1,7 +1,6 @@
 package com.civicpulse.grievance.controller;
 
 import com.civicpulse.grievance.dto.*;
-import org.springframework.security.access.prepost.PreAuthorize;
 import com.civicpulse.grievance.service.interfaces.GrievanceHistoryService;
 import com.civicpulse.grievance.service.interfaces.GrievanceService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,14 +8,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@EnableFeignClients
 @RestController
 @RequestMapping("/api/grievances")
 @RequiredArgsConstructor
@@ -40,7 +38,7 @@ public class GrievanceController {
     }
 
     @Operation(summary = "Get all grievances")
-    @PreAuthorize("hasAnyRole('ADMIN','OFFICER','COMMISSIONER','CITIZEN')")
+    @PreAuthorize("hasAnyRole('ADMIN','OFFICER','COMMISSIONER')")
     @GetMapping
     public ResponseEntity<List<GrievanceResponse>> getAllGrievances() {
 
@@ -48,7 +46,7 @@ public class GrievanceController {
     }
 
     @Operation(summary = "Get grievance by ID")
-    @PreAuthorize("hasAnyRole('ADMIN','OFFICER','COMMISSIONER','CITIZEN')")
+    @PreAuthorize("hasAnyRole('ADMIN','OFFICER','COMMISSIONER')")
     @GetMapping("/{id}")
     public ResponseEntity<GrievanceResponse> getGrievanceById(
             @PathVariable Long id) {
@@ -57,7 +55,7 @@ public class GrievanceController {
     }
 
     @Operation(summary = "Get grievances by Citizen ID")
-    @PreAuthorize("hasAnyRole('ADMIN','OFFICER','COMMISSIONER','CITIZEN')")
+    @PreAuthorize("hasAnyRole('ADMIN','OFFICER','COMMISSIONER')")
     @GetMapping("/citizen/{citizenId}")
     public ResponseEntity<List<GrievanceResponse>> getGrievancesByCitizenId(
             @PathVariable Long citizenId) {
@@ -126,7 +124,7 @@ public class GrievanceController {
     )
     @ApiResponse(responseCode = "200", description = "History retrieved successfully")
     @ApiResponse(responseCode = "404", description = "Grievance not found")
-    @PreAuthorize("hasAnyRole('ADMIN','OFFICER','COMMISSIONER','CITIZEN')")
+    @PreAuthorize("hasAnyRole('ADMIN','OFFICER','COMMISSIONER')")
     @GetMapping("/{id}/history")
     public ResponseEntity<List<GrievanceHistoryResponse>> getGrievanceHistory(
             @PathVariable Long id) {

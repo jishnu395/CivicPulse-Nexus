@@ -29,57 +29,42 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
 
-                        // ===========================
                         // Swagger
-                        // ===========================
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**"
                         ).permitAll()
 
-                        // ===========================
                         // Dashboard
-                        // ===========================
                         .requestMatchers(HttpMethod.GET, "/api/grievances/dashboard")
                         .hasAnyRole("ADMIN", "COMMISSIONER")
 
-                        // ===========================
                         // Create Grievance
-                        // ===========================
                         .requestMatchers(HttpMethod.POST, "/api/grievances")
                         .hasRole("CITIZEN")
 
-                        // ===========================
                         // View Grievances
-                        // ===========================
                         .requestMatchers(HttpMethod.GET, "/api/grievances/**")
                         .hasAnyRole(
                                 "ADMIN",
                                 "OFFICER",
-                                "COMMISSIONER",
-                                "CITIZEN"
+                                "COMMISSIONER"
                         )
 
-                        // ===========================
-                        // Update Grievance
-                        // ===========================
-
-
+                        // Assign
                         .requestMatchers(HttpMethod.PUT, "/api/grievances/*/assign")
                         .hasAnyRole("ADMIN", "COMMISSIONER")
 
-// Status
+                        // Update Status
                         .requestMatchers(HttpMethod.PUT, "/api/grievances/*/status")
                         .hasAnyRole("ADMIN", "OFFICER", "COMMISSIONER")
 
-// General Update
+                        // General Update
                         .requestMatchers(HttpMethod.PUT, "/api/grievances/*")
                         .hasAnyRole("ADMIN", "OFFICER")
 
-                        // ===========================
-                        // Delete Grievance
-                        // ===========================
+                        // Delete
                         .requestMatchers(HttpMethod.DELETE, "/api/grievances/**")
                         .hasRole("ADMIN")
 
