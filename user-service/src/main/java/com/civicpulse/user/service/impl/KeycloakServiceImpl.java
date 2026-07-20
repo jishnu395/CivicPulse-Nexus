@@ -25,7 +25,12 @@ public class KeycloakServiceImpl implements KeycloakService {
     private String realm;
 
     @Override
-    public String createUser(String email, String password, Role role) {
+    public String createUser(
+            String firstName,
+            String lastName,
+            String email,
+            String password,
+            Role role) {
 
         try {
 
@@ -34,6 +39,8 @@ public class KeycloakServiceImpl implements KeycloakService {
             user.setUsername(email);
             user.setEmail(email);
             user.setEmailVerified(true);
+            user.setFirstName(firstName);
+            user.setLastName(lastName);
 
             CredentialRepresentation credential = new CredentialRepresentation();
             credential.setType(CredentialRepresentation.PASSWORD);

@@ -13,24 +13,22 @@ public class KeycloakAdminConfig {
     @Value("${keycloak.server-url}")
     private String serverUrl;
 
-    @Value("${keycloak.realm}")
-    private String realm;
+    @Value("${keycloak.admin-username}")
+    private String adminUsername;
 
-    @Value("${keycloak.client-id}")
-    private String clientId;
-
-    @Value("${keycloak.client-secret}")
-    private String clientSecret;
+    @Value("${keycloak.admin-password}")
+    private String adminPassword;
 
     @Bean
     public Keycloak keycloak() {
 
         return KeycloakBuilder.builder()
                 .serverUrl(serverUrl)
-                .realm(realm)
-                .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
-                .clientId(clientId)
-                .clientSecret(clientSecret)
+                .realm("master")
+                .grantType(OAuth2Constants.PASSWORD)
+                .clientId("admin-cli")
+                .username(adminUsername)
+                .password(adminPassword)
                 .build();
     }
 }

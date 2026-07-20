@@ -10,13 +10,19 @@ import lombok.Getter;
 @Data
 public class RegisterRequest {
 
-    @NotBlank(message = "Email is required")
-    @Email(message = "Invalid email")
+    @NotBlank
+    private String firstName;
+
+    @NotBlank
+    private String lastName;
+
+    @NotBlank
+    @Email
     private String email;
 
-    @NotBlank(message = "Password is required")
+    @NotBlank
     private String password;
 
-    @NotNull(message = "Role is required")
+    @NotNull
     private Role role;
 }

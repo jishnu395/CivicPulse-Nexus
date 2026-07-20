@@ -47,6 +47,8 @@ public class AuthServiceImpl implements AuthService {
             }
 
             String keycloakId = keycloakService.createUser(
+                    request.getFirstName(),
+                    request.getLastName(),
                     request.getEmail(),
                     request.getPassword(),
                     request.getRole()

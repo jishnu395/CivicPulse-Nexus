@@ -1,8 +1,10 @@
 import {
+    Alert,
     Button,
     Container,
     MenuItem,
     Paper,
+    Snackbar,
     TextField,
     Typography
 } from "@mui/material";
@@ -13,6 +15,14 @@ import { grievanceAPI } from "../services/api";
 export default function RegisterGrievance() {
 
     const navigate = useNavigate();
+
+    const [loading, setLoading] = useState(false);
+
+    const [snackbar, setSnackbar] = useState({
+        open: false,
+        severity: "success",
+        message: ""
+    });
 
     const [grievance, setGrievance] = useState({
         citizenId: "",
@@ -34,11 +44,35 @@ export default function RegisterGrievance() {
 
         e.preventDefault();
 
+        if (
+            !grievance.citizenId ||
+            !grievance.title ||
+            !grievance.description ||
+            !grievance.category ||
+            !grievance.location ||
+            !grievance.priority
+        ) {
+
+            setSnackbar({
+                open: true,
+                severity: "warning",
+                message: "Please fill all fields."
+            });
+
+            return;
+        }
+
         try {
 
-            await grievanceAPI.post("", grievance);
+            setLoading(true);
 
-            alert("Grievance Registered Successfully");
+            await grievanceAPI.create(grievance);
+
+            setSnackbar({
+                open: true,
+                severity: "success",
+                message: "Grievance Registered Successfully"
+            });
 
             setGrievance({
                 citizenId: "",
@@ -50,8 +84,17 @@ export default function RegisterGrievance() {
             });
 
         } catch (error) {
-            console.error(error);
-            alert("Registration Failed");
+
+            setSnackbar({
+                open: true,
+                severity: "error",
+                message:
+                    error?.response?.data?.message ||
+                    "Registration Failed"
+            });
+
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -78,10 +121,12 @@ export default function RegisterGrievance() {
                     <TextField
                         fullWidth
                         margin="normal"
+                        type="number"
                         label="Citizen ID"
                         name="citizenId"
                         value={grievance.citizenId}
                         onChange={handleChange}
+                        required
                     />
 
                     <TextField
@@ -91,6 +136,7 @@ export default function RegisterGrievance() {
                         name="title"
                         value={grievance.title}
                         onChange={handleChange}
+                        required
                     />
 
                     <TextField
@@ -102,6 +148,7 @@ export default function RegisterGrievance() {
                         name="description"
                         value={grievance.description}
                         onChange={handleChange}
+                        required
                     />
 
                     <TextField
@@ -111,6 +158,7 @@ export default function RegisterGrievance() {
                         name="category"
                         value={grievance.category}
                         onChange={handleChange}
+                        required
                     />
 
                     <TextField
@@ -120,6 +168,7 @@ export default function RegisterGrievance() {
                         name="location"
                         value={grievance.location}
                         onChange={handleChange}
+                        required
                     />
 
                     <TextField
@@ -130,6 +179,7 @@ export default function RegisterGrievance() {
                         name="priority"
                         value={grievance.priority}
                         onChange={handleChange}
+                        required
                     >
                         <MenuItem value="HIGH">HIGH</MenuItem>
                         <MenuItem value="MEDIUM">MEDIUM</MenuItem>
@@ -141,13 +191,31 @@ export default function RegisterGrievance() {
                         variant="contained"
                         fullWidth
                         sx={{ mt: 3 }}
+                        disabled={loading}
                     >
-                        Register Grievance
+                        {loading
+                            ? "Registering..."
+                            : "Register Grievance"}
                     </Button>
 
                 </form>
 
             </Paper>
+
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={3000}
+                onClose={() =>
+                    setSnackbar((prev) => ({
+                        ...prev,
+                        open: false
+                    }))
+                }
+            >
+                <Alert severity={snackbar.severity}>
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
 
         </Container>
     );

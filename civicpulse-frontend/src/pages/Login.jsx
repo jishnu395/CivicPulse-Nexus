@@ -1,6 +1,20 @@
-import { Button, Container, Paper, TextField, Typography } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import {
+    Box,
+    Button,
+    CircularProgress,
+    Container,
+    Paper,
+    TextField,
+    Typography
+} from "@mui/material";
+
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+import { toast } from "react-toastify";
+
+import { login } from "../services/authService";
+import { saveAuth, getRole, getUser } from "../utils/auth";
 
 export default function Login() {
 
@@ -9,57 +23,146 @@ export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const handleLogin = (e) => {
+    const [loading, setLoading] = useState(false);
+
+    const handleLogin = async (e) => {
+
         e.preventDefault();
 
-        // Temporary navigation
-        navigate("/home");
+        if (!email || !password) {
+            toast.error("Please enter email and password.");
+            return;
+        }
+
+        try {
+
+            setLoading(true);
+
+            const response = await login(email, password);
+
+            console.log("Login Response:", response);
+
+            saveAuth(response);
+
+            console.log("Stored Token:", localStorage.getItem("accessToken"));
+            console.log("Role:", getRole());
+
+            toast.success("Login Successful");
+
+            const role = getRole();
+
+            switch (role) {
+
+                case "ADMIN":
+                    navigate("/admin/dashboard");
+                    break;
+
+                case "COMMISSIONER":
+                    navigate("/commissioner/dashboard");
+                    break;
+
+                case "OFFICER":
+                    navigate("/officer/dashboard");
+                    break;
+
+                case "CITIZEN":
+                    navigate("/citizen/dashboard");
+                    break;
+
+                default:
+                    toast.error("Role not assigned.");
+            }
+
+        } catch (error) {
+
+            toast.error(
+                error?.response?.data?.message ||
+                "Invalid email or password."
+            );
+
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
-        <Container maxWidth="sm" sx={{ mt: 10 }}>
 
-            <Paper elevation={4} sx={{ p: 4 }}>
+        <Container maxWidth="sm">
 
-                <Typography variant="h4" align="center" gutterBottom>
-                    CivicPulse Nexus
-                </Typography>
+            <Box
+                sx={{
+                    minHeight: "100vh",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center"
+                }}
+            >
 
-                <Typography align="center" sx={{ mb: 3 }}>
-                    Login
-                </Typography>
+                <Paper
+                    elevation={4}
+                    sx={{
+                        width: "100%",
+                        p: 5
+                    }}
+                >
 
-                <form onSubmit={handleLogin}>
-
-                    <TextField
-                        label="Email"
-                        fullWidth
-                        margin="normal"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                    />
-
-                    <TextField
-                        label="Password"
-                        type="password"
-                        fullWidth
-                        margin="normal"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                    />
-
-                    <Button
-                        type="submit"
-                        variant="contained"
-                        fullWidth
-                        sx={{ mt: 3 }}
+                    <Typography
+                        variant="h4"
+                        align="center"
+                        gutterBottom
                     >
-                        Login
-                    </Button>
+                        CivicPulse Nexus
+                    </Typography>
 
-                </form>
+                    <Typography
+                        align="center"
+                        color="text.secondary"
+                        sx={{ mb: 4 }}
+                    >
+                        Sign in to continue
+                    </Typography>
 
-            </Paper>
+                    <form onSubmit={handleLogin}>
+
+                        <TextField
+                            label="Email"
+                            fullWidth
+                            margin="normal"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                        />
+
+                        <TextField
+                            label="Password"
+                            type="password"
+                            fullWidth
+                            margin="normal"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
+
+                        <Button
+                            type="submit"
+                            variant="contained"
+                            fullWidth
+                            size="large"
+                            sx={{ mt: 3 }}
+                            disabled={loading}
+                        >
+
+                            {
+                                loading
+                                    ? <CircularProgress size={24} color="inherit" />
+                                    : "Login"
+                            }
+
+                        </Button>
+
+                    </form>
+
+                </Paper>
+
+            </Box>
 
         </Container>
     );

@@ -1,0 +1,14 @@
+package com.civicpulse.servicemanagement.enums;
+
+public enum CertificateType {
+    BIRTH_CERTIFICATE,
+    DEATH_CERTIFICATE,
+    INCOME_CERTIFICATE,
+    RESIDENCE_CERTIFICATE,
+    MARRIAGE_CERTIFICATE,
+
+    TRADE_LICENSE,
+    SHOP_LICENSE,
+    BUILDING_PERMIT,
+    WATER_CONNECTION_PERMIT
+}

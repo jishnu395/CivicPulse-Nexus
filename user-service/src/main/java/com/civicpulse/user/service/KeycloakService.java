@@ -5,7 +5,12 @@ import org.keycloak.representations.idm.UserRepresentation;
 
 public interface KeycloakService {
 
-    String createUser(String email, String password, Role role);
+    String createUser(
+            String firstName,
+            String lastName,
+            String email,
+            String password,
+            Role role);
 
     UserRepresentation getUserById(String userId);
 

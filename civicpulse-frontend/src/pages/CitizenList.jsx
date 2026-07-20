@@ -1,99 +1,271 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { citizenAPI } from "../services/api";
-
+import { useEffect, useMemo, useState } from "react";
 import {
-    Container,
-    Paper,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Typography,
-    Button,
+  Box,
+  Button,
+  MenuItem,
+  Paper,
+  Snackbar,
+  Alert,
+  Stack,
+  TextField,
+  Typography,
 } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
 
-export default function CitizenList() {
+import citizenService from "../services/citizenService";
+import CitizenTable from "../components/citizen/CitizenTable";
+import CitizenForm from "../components/citizen/CitizenForm";
+import CitizenDetailsDialog from "../components/citizen/CitizenDetailsDialog";
+import DeleteCitizenDialog from "../components/citizen/DeleteCitizenDialog";
+import { getRole } from "../utils/auth";
 
-    const [citizens, setCitizens] = useState([]);
+const CitizenList = () => {
+  const role = getRole();
 
-    const navigate = useNavigate();
+  const [citizens, setCitizens] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        loadCitizens();
-    }, []);
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState("");
+  const [ward, setWard] = useState("");
 
-    const loadCitizens = async () => {
-        try {
-            const response = await citizenAPI.get("");
-            setCitizens(response.data);
-        } catch (error) {
-            console.error(error);
+  const [selectedCitizen, setSelectedCitizen] = useState(null);
+
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [formOpen, setFormOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+
+  const [editing, setEditing] = useState(false);
+
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    severity: "success",
+    message: "",
+  });
+
+  const showSnackbar = (message, severity = "success") => {
+    setSnackbar({
+      open: true,
+      message,
+      severity,
+    });
+  };
+
+  const loadCitizens = async () => {
+    try {
+      setLoading(true);
+      const res = await citizenService.getAllCitizens();
+      setCitizens(res.data);
+    } catch (e) {
+      showSnackbar("Failed to load citizens", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadCitizens();
+  }, []);
+
+  const filteredCitizens = useMemo(() => {
+    return citizens.filter((citizen) => {
+      const keyword = search.toLowerCase();
+
+      const matchesSearch =
+        citizen.firstName.toLowerCase().includes(keyword) ||
+        citizen.lastName.toLowerCase().includes(keyword) ||
+        citizen.email.toLowerCase().includes(keyword) ||
+        citizen.phoneNumber.toLowerCase().includes(keyword);
+
+      const matchesStatus =
+        status === "" || citizen.status === status;
+
+      const matchesWard =
+        ward === "" || citizen.wardNumber === ward;
+
+      return matchesSearch && matchesStatus && matchesWard;
+    });
+  }, [citizens, search, status, ward]);
+
+  const wards = [...new Set(citizens.map((c) => c.wardNumber))];
+
+  const handleAdd = () => {
+    setEditing(false);
+    setSelectedCitizen(null);
+    setFormOpen(true);
+  };
+
+  const handleEdit = (citizen) => {
+    setEditing(true);
+    setSelectedCitizen(citizen);
+    setFormOpen(true);
+  };
+
+  const handleView = (citizen) => {
+    setSelectedCitizen(citizen);
+    setDetailsOpen(true);
+  };
+
+  const handleDelete = (citizen) => {
+    setSelectedCitizen(citizen);
+    setDeleteOpen(true);
+  };
+
+  const saveCitizen = async (data) => {
+    try {
+      if (editing) {
+        await citizenService.updateCitizen(
+          selectedCitizen.id,
+          data
+        );
+        showSnackbar("Citizen updated successfully");
+      } else {
+        await citizenService.registerCitizen(data);
+        showSnackbar("Citizen registered successfully");
+      }
+
+      setFormOpen(false);
+      loadCitizens();
+    } catch (e) {
+      showSnackbar("Operation failed", "error");
+    }
+  };
+
+  const confirmDelete = async () => {
+    try {
+      await citizenService.deleteCitizen(selectedCitizen.id);
+
+      showSnackbar("Citizen deleted successfully");
+
+      setDeleteOpen(false);
+
+      loadCitizens();
+    } catch (e) {
+      showSnackbar("Delete failed", "error");
+    }
+  };
+
+  return (
+    <Paper sx={{ p: 3 }}>
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        mb={3}
+      >
+        <Typography variant="h5">
+          Citizen Management
+        </Typography>
+
+        {role === "CITIZEN" && (
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={handleAdd}
+          >
+            Add Citizen
+          </Button>
+        )}
+      </Stack>
+
+      <Stack
+        direction={{ xs: "column", md: "row" }}
+        spacing={2}
+        mb={3}
+      >
+        <TextField
+          label="Search"
+          fullWidth
+          value={search}
+          onChange={(e) =>
+            setSearch(e.target.value)
+          }
+        />
+
+        <TextField
+          select
+          label="Status"
+          sx={{ minWidth: 180 }}
+          value={status}
+          onChange={(e) =>
+            setStatus(e.target.value)
+          }
+        >
+          <MenuItem value="">All</MenuItem>
+          <MenuItem value="ACTIVE">ACTIVE</MenuItem>
+          <MenuItem value="INACTIVE">INACTIVE</MenuItem>
+        </TextField>
+
+        <TextField
+          select
+          label="Ward"
+          sx={{ minWidth: 180 }}
+          value={ward}
+          onChange={(e) =>
+            setWard(e.target.value)
+          }
+        >
+          <MenuItem value="">All</MenuItem>
+
+          {wards.map((w) => (
+            <MenuItem key={w} value={w}>
+              {w}
+            </MenuItem>
+          ))}
+        </TextField>
+      </Stack>
+
+      <Box sx={{ height: 650 }}>
+        <CitizenTable
+          citizens={filteredCitizens}
+          loading={loading}
+          onView={handleView}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          role={role}
+        />
+      </Box>
+
+      <CitizenForm
+        open={formOpen}
+        onClose={() => setFormOpen(false)}
+        onSubmit={saveCitizen}
+        citizen={selectedCitizen}
+        title={
+          editing
+            ? "Edit Citizen"
+            : "Register Citizen"
         }
-    };
+      />
 
-    return (
-        <Container sx={{ mt: 5 }}>
+      <CitizenDetailsDialog
+        open={detailsOpen}
+        onClose={() => setDetailsOpen(false)}
+        citizen={selectedCitizen}
+      />
 
-            <Button
-                variant="contained"
-                onClick={() => navigate("/home")}
-                sx={{ mb: 2 }}
-            >
-                Back
-            </Button>
+      <DeleteCitizenDialog
+        open={deleteOpen}
+        onClose={() => setDeleteOpen(false)}
+        onConfirm={confirmDelete}
+        citizen={selectedCitizen}
+      />
 
-            <Typography variant="h4" gutterBottom>
-                Citizens
-            </Typography>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={() =>
+          setSnackbar((prev) => ({
+            ...prev,
+            open: false,
+          }))
+        }
+      >
+        <Alert severity={snackbar.severity}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+    </Paper>
+  );
+};
 
-            <TableContainer component={Paper}>
-
-                <Table>
-
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>ID</TableCell>
-                            <TableCell>Citizen ID</TableCell>
-                            <TableCell>Name</TableCell>
-                            <TableCell>Phone</TableCell>
-                            <TableCell>Ward</TableCell>
-                            <TableCell>Status</TableCell>
-                        </TableRow>
-                    </TableHead>
-
-                    <TableBody>
-
-                        {citizens.map((citizen) => (
-
-                            <TableRow key={citizen.id}>
-
-                                <TableCell>{citizen.id}</TableCell>
-
-                                <TableCell>{citizen.citizenId}</TableCell>
-
-                                <TableCell>
-                                    {citizen.firstName} {citizen.lastName}
-                                </TableCell>
-
-                                <TableCell>{citizen.phoneNumber}</TableCell>
-
-                                <TableCell>{citizen.wardNumber}</TableCell>
-
-                                <TableCell>{citizen.status}</TableCell>
-
-                            </TableRow>
-
-                        ))}
-
-                    </TableBody>
-
-                </Table>
-
-            </TableContainer>
-
-        </Container>
-    );
-}
+export default CitizenList;
