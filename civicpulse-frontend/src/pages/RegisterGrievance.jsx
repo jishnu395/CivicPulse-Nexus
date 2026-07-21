@@ -106,7 +106,7 @@ export default function RegisterGrievance() {
 
                 <Button
                     variant="contained"
-                    onClick={() => navigate("/home")}
+                    onClick={() => navigate(-1)}
                     sx={{ mb: 2 }}
                 >
                     Back

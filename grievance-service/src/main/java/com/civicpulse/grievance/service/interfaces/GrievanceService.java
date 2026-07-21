@@ -23,4 +23,6 @@ public interface GrievanceService {
     GrievanceResponse assignGrievance(Long grievanceId, AssignGrievanceRequest request);
 
     GrievanceDashboardResponse getDashboard();
+
+    List<GrievanceResponse> getMyGrievances(String email);
 }

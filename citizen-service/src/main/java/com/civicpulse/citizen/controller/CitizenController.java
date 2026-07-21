@@ -139,4 +139,18 @@ public class CitizenController {
         return ResponseEntity.ok(
                 citizenService.getCitizensByStatus(status));
     }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<CitizenResponse> getCitizenByUserId(@PathVariable Long userId) {
+        return ResponseEntity.ok(citizenService.getCitizenByUserId(userId));
+    }
+
+    @GetMapping("/email/{email}")
+    public ResponseEntity<CitizenResponse> getCitizenByEmail(
+            @PathVariable String email) {
+
+        return ResponseEntity.ok(
+                citizenService.getCitizenByEmail(email)
+        );
+    }
 }

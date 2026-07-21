@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.util.List;
 
@@ -134,11 +136,26 @@ public class GrievanceController {
     }
 
     @Operation(summary = "Dashboard")
-    @PreAuthorize("hasAnyRole('ADMIN','COMMISSIONER')")
+    @PreAuthorize("hasAnyRole('ADMIN','COMMISSIONER','OFFICER','CITIZEN')")
     @GetMapping("/dashboard")
     public ResponseEntity<GrievanceDashboardResponse> getDashboard() {
 
         return ResponseEntity.ok(
                 grievanceService.getDashboard());
+    }
+
+    @Operation(summary = "My Grievances")
+    @PreAuthorize("hasRole('CITIZEN')")
+    @GetMapping("/my")
+    public ResponseEntity<List<GrievanceResponse>> getMyGrievances(
+            Authentication authentication) {
+
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+
+        String email = jwt.getClaimAsString("email");
+
+        return ResponseEntity.ok(
+                grievanceService.getMyGrievances(email)
+        );
     }
 }

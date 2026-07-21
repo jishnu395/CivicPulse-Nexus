@@ -24,4 +24,7 @@ public interface CitizenService {
 
     List<CitizenResponse> getCitizensByStatus(CitizenStatus status);
 
+    CitizenResponse getCitizenByUserId(Long userId);
+
+    CitizenResponse getCitizenByEmail(String email);
 }

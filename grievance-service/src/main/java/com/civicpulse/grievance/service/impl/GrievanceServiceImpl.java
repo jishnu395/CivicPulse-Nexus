@@ -133,6 +133,20 @@ public class GrievanceServiceImpl implements GrievanceService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<GrievanceResponse> getMyGrievances(String email) {
+
+        Long citizenId = citizenClient
+                .getCitizenByEmail(email)
+                .getId();
+
+        return grievanceRepository.findByCitizenId(citizenId)
+                .stream()
+                .map(grievanceMapper::toResponse)
+                .toList();
+    }
+
+    @Override
     public GrievanceResponse updateGrievance(Long id,
                                              UpdateGrievanceRequest request) {
 

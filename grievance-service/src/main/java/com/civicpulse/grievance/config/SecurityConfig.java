@@ -38,7 +38,7 @@ public class SecurityConfig {
 
                         // Dashboard
                         .requestMatchers(HttpMethod.GET, "/api/grievances/dashboard")
-                        .hasAnyRole("ADMIN", "COMMISSIONER")
+                        .hasAnyRole("ADMIN", "COMMISSIONER", "OFFICER", "CITIZEN")
 
                         // Create Grievance
                         .requestMatchers(HttpMethod.POST, "/api/grievances")
@@ -49,7 +49,8 @@ public class SecurityConfig {
                         .hasAnyRole(
                                 "ADMIN",
                                 "OFFICER",
-                                "COMMISSIONER"
+                                "COMMISSIONER",
+                                "CITIZEN"
                         )
 
                         // Assign

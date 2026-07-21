@@ -15,4 +15,9 @@ public interface CitizenClient {
     @GetMapping("/api/citizens/{id}")
     CitizenResponse getCitizenById(@PathVariable("id") Long id);
 
+    @GetMapping("/api/citizens/user/{userId}")
+    CitizenResponse getCitizenByUserId(@PathVariable("userId") Long userId);
+
+    @GetMapping("/api/citizens/email/{email}")
+    CitizenResponse getCitizenByEmail(@PathVariable("email") String email);
 }

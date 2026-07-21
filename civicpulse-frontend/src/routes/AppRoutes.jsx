@@ -2,7 +2,11 @@ import { Routes, Route, Navigate } from "react-router-dom";
 
 import Login from "../pages/Login";
 
-import Dashboard from "../pages/Dashboard";
+import AdminDashboard from "../DashboardLayout/AdminDashboard";
+import CommissionerDashboard from "../DashboardLayout/CommissionerDashboard";
+import OfficerDashboard from "../DashboardLayout/OfficerDashboard";
+import CitizenDashboard from "../DashboardLayout/CitizenDashboard";
+
 import RegisterCitizen from "../pages/RegisterCitizen";
 import CitizenList from "../pages/CitizenList";
 import RegisterGrievance from "../pages/RegisterGrievance";
@@ -10,6 +14,7 @@ import GrievanceList from "../pages/GrievanceList";
 import GrievanceHistory from "../pages/GrievanceHistory";
 
 import ProtectedRoute from "../components/ProtectedRoute";
+import MyGrievances from "../pages/MyGrievances";
 
 export default function AppRoutes() {
 
@@ -17,56 +22,51 @@ export default function AppRoutes() {
 
         <Routes>
 
-            <Route
-                path="/"
-                element={<Login />}
-            />
+            <Route path="/" element={<Login />} />
 
-            {/* ---------------- ADMIN ---------------- */}
+            {/* ADMIN */}
 
             <Route
                 path="/admin/dashboard"
                 element={
                     <ProtectedRoute>
-                        <Dashboard />
+                        <AdminDashboard />
                     </ProtectedRoute>
                 }
             />
 
-            {/* ---------------- COMMISSIONER ---------------- */}
+            {/* COMMISSIONER */}
 
             <Route
                 path="/commissioner/dashboard"
                 element={
                     <ProtectedRoute>
-                        <Dashboard />
+                        <CommissionerDashboard />
                     </ProtectedRoute>
                 }
             />
 
-            {/* ---------------- OFFICER ---------------- */}
+            {/* OFFICER */}
 
             <Route
                 path="/officer/dashboard"
                 element={
                     <ProtectedRoute>
-                        <Dashboard />
+                        <OfficerDashboard />
                     </ProtectedRoute>
                 }
             />
 
-            {/* ---------------- CITIZEN ---------------- */}
+            {/* CITIZEN */}
 
             <Route
                 path="/citizen/dashboard"
                 element={
                     <ProtectedRoute>
-                        <Dashboard />
+                        <CitizenDashboard />
                     </ProtectedRoute>
                 }
             />
-
-            {/* Shared Pages */}
 
             <Route
                 path="/citizens"
@@ -91,6 +91,15 @@ export default function AppRoutes() {
                 element={
                     <ProtectedRoute>
                         <GrievanceList />
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route
+                path="/my-grievances"
+                element={
+                    <ProtectedRoute>
+                        <MyGrievances />
                     </ProtectedRoute>
                 }
             />

@@ -1,7 +1,9 @@
 import api from "../api/axios";
 
 export const citizenAPI = {
-    getAll: () => api.get("/api/citizens"),
+
+    getByUserId: (userId) =>
+        api.get(`/api/citizens/user/${userId}`),
 
     getById: (id) =>
         api.get(`/api/citizens/${id}`),
@@ -26,6 +28,9 @@ export const grievanceAPI = {
 
     getAll: () =>
         api.get("/api/grievances"),
+
+    getMy: () =>
+        api.get("/api/grievances/my"),
 
     getById: (id) =>
         api.get(`/api/grievances/${id}`),

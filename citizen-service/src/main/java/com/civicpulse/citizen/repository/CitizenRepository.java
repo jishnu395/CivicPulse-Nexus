@@ -1,5 +1,6 @@
 package com.civicpulse.citizen.repository;
 
+import com.civicpulse.citizen.dto.response.CitizenResponse;
 import com.civicpulse.citizen.entity.Citizen;
 import com.civicpulse.citizen.util.enums.CitizenStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -28,4 +29,6 @@ public interface CitizenRepository extends JpaRepository<Citizen, Long> {
     boolean existsByPhoneNumber(String phoneNumber);
 
     boolean existsByUserId(Long userId);
+
+    CitizenResponse getCitizenByEmail(String email);
 }

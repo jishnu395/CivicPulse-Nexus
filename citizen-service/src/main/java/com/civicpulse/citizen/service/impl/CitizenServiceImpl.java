@@ -15,7 +15,11 @@ import com.civicpulse.citizen.repository.CitizenRepository;
 import com.civicpulse.citizen.service.interfaces.CitizenService;
 import com.civicpulse.citizen.util.enums.CitizenStatus;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
@@ -132,5 +136,24 @@ public class CitizenServiceImpl implements CitizenService {
                 .stream()
                 .map(citizenMapper::toResponse)
                 .toList();
+    }
+
+    @Override
+    public CitizenResponse getCitizenByUserId(Long userId) {
+
+        Citizen citizen = citizenRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Citizen not found"));
+
+        return citizenMapper.toResponse(citizen);
+    }
+
+    @Override
+    public CitizenResponse getCitizenByEmail(String email) {
+
+        Citizen citizen = citizenRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new CitizenNotFoundException("Citizen not found"));
+
+        return citizenMapper.toResponse(citizen);
     }
 }

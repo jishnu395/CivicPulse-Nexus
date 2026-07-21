@@ -120,7 +120,7 @@ export default function Dashboard() {
             <Button
                 variant="contained"
                 sx={{ mb: 3 }}
-                onClick={() => navigate("/home")}
+                onClick={() => navigate(-1)}
             >
                 Back
             </Button>

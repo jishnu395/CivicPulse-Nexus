@@ -43,6 +43,7 @@ export default function Login() {
             console.log("Login Response:", response);
 
             saveAuth(response);
+            console.log(getUser());
 
             console.log("Stored Token:", localStorage.getItem("accessToken"));
             console.log("Role:", getRole());
