@@ -4,7 +4,6 @@ import Login from "../pages/Login";
 
 import AdminDashboard from "../DashboardLayout/AdminDashboard";
 import CommissionerDashboard from "../DashboardLayout/CommissionerDashboard";
-import OfficerDashboard from "../DashboardLayout/OfficerDashboard";
 import CitizenDashboard from "../DashboardLayout/CitizenDashboard";
 
 import RegisterCitizen from "../pages/RegisterCitizen";
@@ -15,6 +14,14 @@ import GrievanceHistory from "../pages/GrievanceHistory";
 
 import ProtectedRoute from "../components/ProtectedRoute";
 import MyGrievances from "../pages/MyGrievances";
+import ApplyCertificate from "../pages/ApplyCertificate";
+import MyApplications from "../pages/MyApplications";
+import UploadDocument from "../pages/UploadDocument";
+import TrackApplication from "../pages/TrackApplication";
+import PendingApplications from "../pages/PendingApplications";
+import Verification from "../pages/Verification";
+import Approval from "../pages/Approval";
+import OfficerDashboard from "../DashboardLayout/OfficerDashboard";
 
 export default function AppRoutes() {
 
@@ -69,6 +76,15 @@ export default function AppRoutes() {
             />
 
             <Route
+                path="/my-applications"
+                element={
+                    <ProtectedRoute>
+                        <MyApplications />
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route
                 path="/citizens"
                 element={
                     <ProtectedRoute>
@@ -76,6 +92,30 @@ export default function AppRoutes() {
                     </ProtectedRoute>
                 }
             />
+
+            <Route
+                path="/upload-document/:applicationId"
+                element={
+                    <ProtectedRoute>
+                        <UploadDocument />
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route
+                path="/track-application/:applicationId"
+                element={
+                    <ProtectedRoute>
+                        <TrackApplication />
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route path="/officer-dashboard" element={<OfficerDashboard />} />
+            <Route path="/pending-applications" element={<PendingApplications />} />
+            <Route path="/verification/:id" element={<Verification />} />
+            <Route path="/approval/:id" element={<Approval />} />
+            <Route path="/approval/dashboard" element={<ApprovalDashboard />} />
 
             <Route
                 path="/citizens/register"
@@ -109,6 +149,15 @@ export default function AppRoutes() {
                 element={
                     <ProtectedRoute>
                         <RegisterGrievance />
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route
+                path="/apply-certificate"
+                element={
+                    <ProtectedRoute>
+                        <ApplyCertificate />
                     </ProtectedRoute>
                 }
             />

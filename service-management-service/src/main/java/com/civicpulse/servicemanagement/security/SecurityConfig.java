@@ -2,7 +2,6 @@ package com.civicpulse.servicemanagement.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -17,35 +16,64 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
 
+                        // Swagger
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**"
                         ).permitAll()
 
+                        // Citizen APIs
                         .requestMatchers("/api/certificates/**")
-                        .hasAnyRole("CITIZEN","ADMIN")
+                        .hasAnyRole("CITIZEN", "ADMIN")
 
+                        // Document APIs
                         .requestMatchers("/api/documents/**")
-                        .hasAnyRole("CITIZEN","VERIFICATION_OFFICER","ADMIN")
+                        .hasAnyRole("CITIZEN", "OFFICER", "ADMIN")
 
-                        .requestMatchers("/api/officer/**")
-                        .hasAnyRole("VERIFICATION_OFFICER","DEPARTMENT_OFFICER","ADMIN")
+                        // Verification Officer
+                        .requestMatchers("/api/officer/pending")
+                        .hasAnyRole("OFFICER", "ADMIN")
 
-                        .requestMatchers("/api/certificate/**")
-                        .hasAnyRole("DEPARTMENT_OFFICER","ADMIN")
+                        .requestMatchers("/api/officer/verify/**")
+                        .hasAnyRole("OFFICER", "ADMIN")
 
+                        .requestMatchers("/api/officer/document/**")
+                        .hasAnyRole("OFFICER", "ADMIN")
+
+                        // Department Officer (Commissioner)
+                        .requestMatchers("/api/officer/approve/**")
+                        .hasAnyRole("COMMISSIONER", "ADMIN")
+
+                        .requestMatchers("/api/officer/reject/**")
+                        .hasAnyRole("COMMISSIONER", "ADMIN")
+
+                        // Certificate Generation
+                        .requestMatchers("/api/certificate/generate/**")
+                        .hasAnyRole("COMMISSIONER", "ADMIN")
+
+                        // Certificate Download
+                        .requestMatchers("/api/certificate/download/**")
+                        .hasAnyRole("CITIZEN", "COMMISSIONER", "ADMIN")
+
+                        // Admin Dashboard
                         .requestMatchers("/api/dashboard/**")
                         .hasRole("ADMIN")
 
+                        // Static PDF files
+                        .requestMatchers("/certificates/**")
+                        .permitAll()
+
                         .anyRequest()
-                        .authenticated())
+                        .authenticated()
+                )
 
                 .oauth2ResourceServer(oauth ->
                         oauth.jwt(jwt ->
                                 jwt.jwtAuthenticationConverter(
                                         new KeycloakJwtRoleConverter()
                                 )
-                        ));
+                        )
+                );
 
         return http.build();
     }

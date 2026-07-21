@@ -32,6 +32,21 @@ export default function CitizenDashboard() {
                     My Grievances
                 </Button>
 
+                <Button
+                    variant="contained"
+                    color="success"
+                    onClick={() => navigate("/apply-certificate")}
+                >
+                    Apply Certificate
+                </Button>
+
+                <Button
+                    variant="outlined"
+                    onClick={() => navigate("/my-applications")}
+                >
+                    My Applications
+                </Button>
+
             </Stack>
 
         </Container>

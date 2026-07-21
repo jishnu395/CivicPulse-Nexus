@@ -21,7 +21,43 @@ export const citizenAPI = {
         api.get(`/api/citizens/ward/${ward}`),
 
     getByStatus: (status) =>
-        api.get(`/api/citizens/status/${status}`)
+        api.get(`/api/citizens/status/${status}`),
+
+    getByEmail: (email) =>
+    api.get(`/api/citizens/email/${email}`)
+};
+
+export const certificateAPI = {
+
+    dashboard: () =>
+        api.get("/api/dashboard"),
+
+    apply: (data) =>
+        api.post("/api/certificates/apply", data),
+
+    getMy: (citizenId) =>
+        api.get(`/api/certificates/my/${citizenId}`),
+
+    getById: (id) =>
+        api.get(`/api/certificates/${id}`),
+
+    pending: () =>
+        api.get("/api/officer/pending"),
+
+    verify: (id, data) =>
+        api.put(`/api/officer/verify/${id}`, data),
+
+    approve: (id, data) =>
+        api.put(`/api/officer/approve/${id}`, data),
+
+    reject: (id, data) =>
+        api.put(`/api/officer/reject/${id}`, data),
+
+    generate: (id) =>
+        api.post(`/api/certificate/generate/${id}`),
+
+    download: (applicationId) =>
+    api.get(`/api/certificate/download/${applicationId}`),
 };
 
 export const grievanceAPI = {

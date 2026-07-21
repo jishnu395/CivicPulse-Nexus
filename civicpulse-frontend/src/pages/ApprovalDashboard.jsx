@@ -1,7 +1,7 @@
 import { Box, Button, Grid, Paper, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
-export default function OfficerDashboard() {
+export default function ApprovalDashboard() {
 
     const navigate = useNavigate();
 
@@ -9,15 +9,16 @@ export default function OfficerDashboard() {
         <Box p={4}>
 
             <Typography variant="h4" gutterBottom>
-                Officer Dashboard
+                Department Officer Dashboard
             </Typography>
 
             <Grid container spacing={3}>
 
-                <Grid item xs={12} md={3}>
+                <Grid item xs={12} md={4}>
                     <Paper sx={{ p: 3, textAlign: "center" }}>
+
                         <Typography variant="h6">
-                            Pending Applications
+                            Approval Workflow
                         </Typography>
 
                         <Button
@@ -25,8 +26,9 @@ export default function OfficerDashboard() {
                             variant="contained"
                             onClick={() => navigate("/pending-applications")}
                         >
-                            View
+                            View Applications
                         </Button>
+
                     </Paper>
                 </Grid>
 

@@ -58,12 +58,12 @@ export default function Login() {
                     navigate("/admin/dashboard");
                     break;
 
-                case "COMMISSIONER":
-                    navigate("/commissioner/dashboard");
+                case "VERIFICATION_OFFICER":
+                    navigate("/officer/dashboard");
                     break;
 
-                case "OFFICER":
-                    navigate("/officer/dashboard");
+                case "DEPARTMENT_OFFICER":
+                    navigate("/approval/dashboard");
                     break;
 
                 case "CITIZEN":
