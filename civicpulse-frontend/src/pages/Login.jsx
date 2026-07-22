@@ -22,7 +22,6 @@ export default function Login() {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-
     const [loading, setLoading] = useState(false);
 
     const handleLogin = async (e) => {
@@ -40,13 +39,11 @@ export default function Login() {
 
             const response = await login(email, password);
 
-            console.log("Login Response:", response);
-
             saveAuth(response);
-            console.log(getUser());
 
-            console.log("Stored Token:", localStorage.getItem("accessToken"));
+            console.log("User:", getUser());
             console.log("Role:", getRole());
+            console.log("Token:", localStorage.getItem("accessToken"));
 
             toast.success("Login Successful");
 
@@ -58,11 +55,11 @@ export default function Login() {
                     navigate("/admin/dashboard");
                     break;
 
-                case "VERIFICATION_OFFICER":
+                case "OFFICER":
                     navigate("/officer/dashboard");
                     break;
 
-                case "DEPARTMENT_OFFICER":
+                case "COMMISSIONER":
                     navigate("/approval/dashboard");
                     break;
 
@@ -150,13 +147,9 @@ export default function Login() {
                             sx={{ mt: 3 }}
                             disabled={loading}
                         >
-
-                            {
-                                loading
-                                    ? <CircularProgress size={24} color="inherit" />
-                                    : "Login"
-                            }
-
+                            {loading
+                                ? <CircularProgress size={24} color="inherit" />
+                                : "Login"}
                         </Button>
 
                     </form>

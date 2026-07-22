@@ -11,4 +11,5 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
     List<Document> findByApplication_Id(Long applicationId);
 
     List<Document> findByVerificationStatus(VerificationStatus status);
+
 }

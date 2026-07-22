@@ -10,7 +10,12 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
 
+        // Generated Certificates
         registry.addResourceHandler("/certificates/**")
                 .addResourceLocations("file:certificates/");
+
+        // Uploaded Documents
+        registry.addResourceHandler("/uploads/**")
+                .addResourceLocations("file:uploads/");
     }
 }

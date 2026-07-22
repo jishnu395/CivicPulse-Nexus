@@ -32,6 +32,7 @@ export default function Approval() {
 
   const handleApprove = async () => {
     try {
+
       await certificateAPI.approve(id, {
         remarks: "Application approved",
       });
@@ -39,6 +40,7 @@ export default function Approval() {
       alert("Application Approved");
 
       loadApplication();
+
     } catch (err) {
       console.error(err);
     }
@@ -46,13 +48,15 @@ export default function Approval() {
 
   const handleReject = async () => {
     try {
+
       await certificateAPI.reject(id, {
         remarks: "Application rejected",
       });
 
       alert("Application Rejected");
 
-      navigate("/pending-applications");
+      navigate("/approval/dashboard");
+
     } catch (err) {
       console.error(err);
     }
@@ -60,11 +64,13 @@ export default function Approval() {
 
   const handleGenerate = async () => {
     try {
+
       await certificateAPI.generate(id);
 
       alert("Certificate Generated");
 
-      navigate("/pending-applications");
+      navigate("/approval/dashboard");
+
     } catch (err) {
       console.error(err);
     }
@@ -74,6 +80,7 @@ export default function Approval() {
 
   return (
     <Box p={3}>
+
       <Typography variant="h4" mb={3}>
         Approval
       </Typography>
@@ -106,6 +113,7 @@ export default function Approval() {
             <Button
               variant="contained"
               color="success"
+              disabled={application.status !== "VERIFIED"}
               onClick={handleApprove}
             >
               Approve
@@ -114,6 +122,7 @@ export default function Approval() {
             <Button
               variant="contained"
               color="error"
+              disabled={application.status !== "VERIFIED"}
               onClick={handleReject}
             >
               Reject
@@ -121,6 +130,7 @@ export default function Approval() {
 
             <Button
               variant="contained"
+              disabled={application.status !== "APPROVED"}
               onClick={handleGenerate}
             >
               Generate Certificate
@@ -130,6 +140,7 @@ export default function Approval() {
 
         </CardContent>
       </Card>
+
     </Box>
   );
 }

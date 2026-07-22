@@ -22,6 +22,7 @@ import PendingApplications from "../pages/PendingApplications";
 import Verification from "../pages/Verification";
 import Approval from "../pages/Approval";
 import OfficerDashboard from "../DashboardLayout/OfficerDashboard";
+import ApprovalDashboard from "../DashboardLayout/ApprovalDashboard";
 
 export default function AppRoutes() {
 
@@ -111,11 +112,41 @@ export default function AppRoutes() {
                 }
             />
 
-            <Route path="/officer-dashboard" element={<OfficerDashboard />} />
-            <Route path="/pending-applications" element={<PendingApplications />} />
-            <Route path="/verification/:id" element={<Verification />} />
-            <Route path="/approval/:id" element={<Approval />} />
-            <Route path="/approval/dashboard" element={<ApprovalDashboard />} />
+            <Route
+                path="/pending-applications"
+                element={
+                    <ProtectedRoute>
+                        <PendingApplications />
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route
+                path="/verification/:id"
+                element={
+                    <ProtectedRoute>
+                        <Verification />
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route
+                path="/approval/:id"
+                element={
+                    <ProtectedRoute>
+                        <Approval />
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route
+                path="/approval/dashboard"
+                element={
+                    <ProtectedRoute>
+                        <ApprovalDashboard />
+                    </ProtectedRoute>
+                }
+            />
 
             <Route
                 path="/citizens/register"

@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.civicpulse.servicemanagement.dto.DocumentVerificationRequest;
+import com.civicpulse.servicemanagement.dto.DocumentResponse;
 
 import java.util.List;
 
@@ -60,5 +61,14 @@ public class OfficerController {
 
         return ResponseEntity.ok(
                 officerService.rejectApplication(applicationId, request));
+    }
+
+    @GetMapping("/documents/{applicationId}")
+    public ResponseEntity<List<DocumentResponse>> getDocuments(
+            @PathVariable Long applicationId) {
+
+        return ResponseEntity.ok(
+                officerService.getDocuments(applicationId)
+        );
     }
 }

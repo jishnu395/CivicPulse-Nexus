@@ -75,7 +75,7 @@ public class DocumentServiceImpl implements DocumentService {
 
             Document document = Document.builder()
                     .documentName(file.getOriginalFilename())
-                    .documentUrl(target.toString())
+                    .documentUrl("/uploads/" + fileName)
                     .fileType(contentType)
                     .fileSize(file.getSize())
                     .verificationStatus(VerificationStatus.PENDING)

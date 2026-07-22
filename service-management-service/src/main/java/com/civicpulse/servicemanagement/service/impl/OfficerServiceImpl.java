@@ -17,6 +17,7 @@ import com.civicpulse.servicemanagement.entity.Document;
 import com.civicpulse.servicemanagement.enums.VerificationStatus;
 import com.civicpulse.servicemanagement.kafka.ApplicationEventProducer;
 import com.civicpulse.servicemanagement.repository.DocumentRepository;
+import com.civicpulse.servicemanagement.dto.DocumentResponse;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -35,7 +36,8 @@ public class OfficerServiceImpl implements OfficerService {
 
         List<ApplicationStatus> pendingStatuses = List.of(
                 ApplicationStatus.SUBMITTED,
-                ApplicationStatus.UNDER_VERIFICATION
+                ApplicationStatus.UNDER_VERIFICATION,
+                ApplicationStatus.VERIFIED
         );
 
         return applicationRepository.findByStatusIn(pendingStatuses)
@@ -146,5 +148,22 @@ public class OfficerServiceImpl implements OfficerService {
         }
 
         return applicationMapper.toResponse(application);
+    }
+
+    @Override
+    public List<DocumentResponse> getDocuments(Long applicationId) {
+
+        return documentRepository.findByApplication_Id(applicationId)
+                .stream()
+                .map(document -> DocumentResponse.builder()
+                        .id(document.getId())
+                        .documentName(document.getDocumentName())
+                        .documentUrl(document.getDocumentUrl())
+                        .fileType(document.getFileType())
+                        .fileSize(document.getFileSize())
+                        .verificationStatus(document.getVerificationStatus())
+                        .remarks(document.getRemarks())
+                        .build())
+                .toList();
     }
 }

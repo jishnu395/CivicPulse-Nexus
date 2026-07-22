@@ -4,6 +4,7 @@ import com.civicpulse.servicemanagement.dto.ApplicationResponse;
 import com.civicpulse.servicemanagement.dto.ApprovalRequest;
 import com.civicpulse.servicemanagement.dto.DocumentVerificationRequest;
 import com.civicpulse.servicemanagement.dto.VerifyDocumentRequest;
+import com.civicpulse.servicemanagement.dto.DocumentResponse;
 
 import java.util.List;
 
@@ -20,5 +21,7 @@ public interface OfficerService {
     ApplicationResponse rejectApplication(Long applicationId, ApprovalRequest request);
 
     ApplicationResponse verifyDocument(Long documentId, DocumentVerificationRequest request);
+
+    List<DocumentResponse> getDocuments(Long applicationId);
 
 }

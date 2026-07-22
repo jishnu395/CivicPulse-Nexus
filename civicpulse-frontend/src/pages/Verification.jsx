@@ -4,6 +4,10 @@ import {
   Button,
   Card,
   CardContent,
+  Divider,
+  List,
+  ListItem,
+  ListItemText,
   Stack,
   Typography,
 } from "@mui/material";
@@ -16,9 +20,11 @@ export default function Verification() {
   const navigate = useNavigate();
 
   const [application, setApplication] = useState(null);
+  const [documents, setDocuments] = useState([]);
 
   useEffect(() => {
     loadApplication();
+    loadDocuments();
   }, []);
 
   const loadApplication = async () => {
@@ -30,15 +36,40 @@ export default function Verification() {
     }
   };
 
+  const loadDocuments = async () => {
+    try {
+      const res = await certificateAPI.getDocuments(id);
+      setDocuments(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const handleVerify = async () => {
     try {
       await certificateAPI.verify(id, {
+        verified: true,
         remarks: "Documents verified successfully",
       });
 
       alert("Application Verified");
+      navigate(-1);
 
-      navigate(`/approval/${id}`);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleCorrection = async () => {
+    try {
+      await certificateAPI.verify(id, {
+        verified: false,
+        remarks: "Please upload correct documents",
+      });
+
+      alert("Marked for correction");
+      navigate(-1);
+
     } catch (err) {
       console.error(err);
     }
@@ -56,15 +87,65 @@ export default function Verification() {
       <Card>
         <CardContent>
 
-          <Typography><b>Application No:</b> {application.applicationNo}</Typography>
+          <Typography>
+            <b>Application No:</b> {application.applicationNo}
+          </Typography>
 
-          <Typography><b>Citizen ID:</b> {application.citizenId}</Typography>
+          <Typography>
+            <b>Citizen ID:</b> {application.citizenId}
+          </Typography>
 
-          <Typography><b>Certificate:</b> {application.certificateType}</Typography>
+          <Typography>
+            <b>Certificate:</b> {application.certificateType}
+          </Typography>
 
-          <Typography><b>Department:</b> {application.department}</Typography>
+          <Typography>
+            <b>Department:</b> {application.department}
+          </Typography>
 
-          <Typography><b>Status:</b> {application.status}</Typography>
+          <Typography>
+            <b>Status:</b> {application.status}
+          </Typography>
+
+          <Divider sx={{ my: 3 }} />
+
+          <Typography variant="h6" gutterBottom>
+            Uploaded Documents
+          </Typography>
+
+          <List>
+
+            {documents.length === 0 ? (
+              <Typography color="text.secondary">
+                No documents uploaded.
+              </Typography>
+            ) : (
+              documents.map((doc) => (
+                <ListItem
+                  key={doc.id}
+                  secondaryAction={
+                    <Button
+                      variant="outlined"
+                      onClick={() =>
+                        window.open(
+                          `http://localhost:8084${doc.documentUrl}`,
+                          "_blank"
+                        )
+                      }
+                    >
+                      View
+                    </Button>
+                  }
+                >
+                  <ListItemText
+                    primary={doc.documentName}
+                    secondary={`Status: ${doc.verificationStatus}`}
+                  />
+                </ListItem>
+              ))
+            )}
+
+          </List>
 
           <Stack
             direction="row"
@@ -82,6 +163,7 @@ export default function Verification() {
             <Button
               variant="outlined"
               color="error"
+              onClick={handleCorrection}
             >
               Need Correction
             </Button>

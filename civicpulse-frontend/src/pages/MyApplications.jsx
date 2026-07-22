@@ -47,6 +47,33 @@ export default function MyApplications() {
 
     };
 
+    const handleDownload = async (applicationId) => {
+
+        try {
+
+            const response = await certificateAPI.download(applicationId);
+
+            const pdfUrl = response.data.pdfUrl;
+
+            if (!pdfUrl) {
+                alert("Certificate not generated.");
+                return;
+            }
+
+            window.open(
+                `http://localhost:8084/${pdfUrl}`,
+                "_blank"
+            );
+
+        } catch (error) {
+
+            console.error(error);
+            alert("Unable to download certificate.");
+
+        }
+
+    };
+
     return (
 
         <Container sx={{ mt: 5 }}>
@@ -121,39 +148,18 @@ export default function MyApplications() {
                                         Track
                                     </Button>
 
-                                    <Button
-                                        size="small"
-                                        color="success"
-                                        variant="contained"
-                                        onClick={async () => {
+                                    {app.status === "CERTIFICATE_GENERATED" && (
 
-                                            try {
+                                        <Button
+                                            size="small"
+                                            color="success"
+                                            variant="contained"
+                                            onClick={() => handleDownload(app.id)}
+                                        >
+                                            Download
+                                        </Button>
 
-                                                const response = await certificateAPI.download(app.id);
-
-                                                const pdfUrl = response.data.pdfUrl;
-
-                                                if (!pdfUrl) {
-                                                    alert("Certificate not generated.");
-                                                    return;
-                                                }
-
-                                                window.open(
-                                                    `http://localhost:8084/${pdfUrl}`,
-                                                    "_blank"
-                                                );
-
-                                            } catch (e) {
-
-                                                console.error(e);
-                                                alert("Unable to download certificate.");
-
-                                            }
-
-                                        }}
-                                    >
-                                        Download
-                                    </Button>
+                                    )}
 
                                 </TableCell>
 

@@ -44,6 +44,9 @@ export const certificateAPI = {
     pending: () =>
         api.get("/api/officer/pending"),
 
+    getDocuments: (applicationId) =>
+        api.get(`/api/officer/documents/${applicationId}`),
+
     verify: (id, data) =>
         api.put(`/api/officer/verify/${id}`, data),
 
