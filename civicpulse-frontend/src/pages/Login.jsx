@@ -60,7 +60,7 @@ export default function Login() {
                     break;
 
                 case "COMMISSIONER":
-                    navigate("/approval/dashboard");
+                    navigate("/commissioner/dashboard");
                     break;
 
                 case "CITIZEN":

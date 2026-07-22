@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { grievanceAPI } from "../services/api";
+import { getRole } from "../utils/auth";
 
 import {
     Button,
@@ -25,6 +26,8 @@ import {
 export default function GrievanceList() {
 
     const navigate = useNavigate();
+
+    const role = getRole();
 
     const [grievances, setGrievances] = useState([]);
 
@@ -65,6 +68,8 @@ export default function GrievanceList() {
         });
 
         setAssignOpen(false);
+        setDepartmentId("");
+        setOfficerId("");
         loadGrievances();
     };
 
@@ -75,10 +80,12 @@ export default function GrievanceList() {
         });
 
         setStatusOpen(false);
+        setStatus("");
         loadGrievances();
     };
 
     return (
+
         <Container sx={{ mt: 5 }}>
 
             <Button
@@ -94,10 +101,13 @@ export default function GrievanceList() {
             </Typography>
 
             <TableContainer component={Paper}>
+
                 <Table>
 
                     <TableHead>
+
                         <TableRow>
+
                             <TableCell>ID</TableCell>
                             <TableCell>Citizen</TableCell>
                             <TableCell>Title</TableCell>
@@ -106,7 +116,9 @@ export default function GrievanceList() {
                             <TableCell>Status</TableCell>
                             <TableCell>SLA</TableCell>
                             <TableCell>Actions</TableCell>
+
                         </TableRow>
+
                     </TableHead>
 
                     <TableBody>
@@ -125,21 +137,37 @@ export default function GrievanceList() {
 
                                 <TableCell>
 
-                                    <Button
-                                        size="small"
-                                        variant="contained"
-                                        sx={{ mr: 1 }}
-                                        onClick={() => openAssign(g.id)}
-                                    >
-                                        Assign
-                                    </Button>
+                                    {(role === "ADMIN" || role === "COMMISSIONER") && (
+
+                                        <Button
+                                            size="small"
+                                            variant="contained"
+                                            sx={{ mr: 1, mb: 1 }}
+                                            onClick={() => openAssign(g.id)}
+                                        >
+                                            Assign
+                                        </Button>
+
+                                    )}
 
                                     <Button
                                         size="small"
                                         variant="outlined"
+                                        sx={{ mr: 1, mb: 1 }}
                                         onClick={() => openStatus(g.id)}
                                     >
                                         Status
+                                    </Button>
+
+                                    <Button
+                                        size="small"
+                                        color="secondary"
+                                        sx={{ mb: 1 }}
+                                        onClick={() =>
+                                            navigate(`/grievances/${g.id}/history`)
+                                        }
+                                    >
+                                        History
                                     </Button>
 
                                 </TableCell>
@@ -151,6 +179,7 @@ export default function GrievanceList() {
                     </TableBody>
 
                 </Table>
+
             </TableContainer>
 
             <Dialog
@@ -158,7 +187,9 @@ export default function GrievanceList() {
                 onClose={() => setAssignOpen(false)}
             >
 
-                <DialogTitle>Assign Grievance</DialogTitle>
+                <DialogTitle>
+                    Assign Grievance
+                </DialogTitle>
 
                 <DialogContent>
 
@@ -202,7 +233,9 @@ export default function GrievanceList() {
                 onClose={() => setStatusOpen(false)}
             >
 
-                <DialogTitle>Update Status</DialogTitle>
+                <DialogTitle>
+                    Update Status
+                </DialogTitle>
 
                 <DialogContent>
 
@@ -239,5 +272,6 @@ export default function GrievanceList() {
             </Dialog>
 
         </Container>
+
     );
 }

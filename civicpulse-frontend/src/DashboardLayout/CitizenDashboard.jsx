@@ -1,22 +1,42 @@
-import { Container, Typography, Button, Stack } from "@mui/material";
+import { Container, Typography, Button, Stack, Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { logout } from "../utils/auth";
 
 export default function CitizenDashboard() {
 
     const navigate = useNavigate();
 
+    const handleLogout = () => {
+        logout();
+        navigate("/");
+    };
+
     return (
         <Container sx={{ mt: 5 }}>
 
-            <Typography
-                variant="h4"
-                fontWeight="bold"
-                gutterBottom
+            <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+                mb={3}
             >
-                Citizen Dashboard
-            </Typography>
+                <Typography
+                    variant="h4"
+                    fontWeight="bold"
+                >
+                    Citizen Dashboard
+                </Typography>
 
-            <Stack spacing={2} sx={{ mt: 3 }}>
+                <Button
+                    variant="contained"
+                    color="error"
+                    onClick={handleLogout}
+                >
+                    Logout
+                </Button>
+            </Box>
+
+            <Stack spacing={2}>
 
                 <Button
                     variant="contained"
