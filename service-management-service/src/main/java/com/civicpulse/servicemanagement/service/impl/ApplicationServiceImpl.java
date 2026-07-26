@@ -2,10 +2,12 @@ package com.civicpulse.servicemanagement.service.impl;
 
 import com.civicpulse.servicemanagement.dto.ApplicationResponse;
 import com.civicpulse.servicemanagement.dto.ApplyCertificateRequest;
+import com.civicpulse.servicemanagement.dto.PermitApplicationRequest;
 import com.civicpulse.servicemanagement.entity.Application;
 import com.civicpulse.servicemanagement.enums.ApplicationStatus;
 import com.civicpulse.servicemanagement.enums.CertificateType;
 import com.civicpulse.servicemanagement.enums.DepartmentType;
+import com.civicpulse.servicemanagement.enums.PermitType;
 import com.civicpulse.servicemanagement.exception.ResourceNotFoundException;
 import com.civicpulse.servicemanagement.mapper.ApplicationMapper;
 import com.civicpulse.servicemanagement.repository.ApplicationRepository;
@@ -31,7 +33,24 @@ public class ApplicationServiceImpl implements ApplicationService {
                 .applicationNo(ApplicationNumberGenerator.generate())
                 .citizenId(request.getCitizenId())
                 .certificateType(request.getCertificateType())
-                .department(getDepartment(request.getCertificateType()))
+                .department(getCertificateDepartment(request.getCertificateType()))
+                .status(ApplicationStatus.SUBMITTED)
+                .submissionDate(LocalDateTime.now())
+                .build();
+
+        Application savedApplication = applicationRepository.save(application);
+
+        return applicationMapper.toResponse(savedApplication);
+    }
+
+    @Override
+    public ApplicationResponse applyPermit(PermitApplicationRequest request) {
+
+        Application application = Application.builder()
+                .applicationNo(ApplicationNumberGenerator.generate())
+                .citizenId(request.getCitizenId())
+                .permitType(request.getPermitType())
+                .department(getPermitDepartment(request.getPermitType()))
                 .status(ApplicationStatus.SUBMITTED)
                 .submissionDate(LocalDateTime.now())
                 .build();
@@ -55,12 +74,13 @@ public class ApplicationServiceImpl implements ApplicationService {
 
         Application application = applicationRepository.findById(applicationId)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Application not found with id : " + applicationId));
+                        new ResourceNotFoundException(
+                                "Application not found with id : " + applicationId));
 
         return applicationMapper.toResponse(application);
     }
 
-    private DepartmentType getDepartment(CertificateType certificateType) {
+    private DepartmentType getCertificateDepartment(CertificateType certificateType) {
 
         return switch (certificateType) {
 
@@ -71,13 +91,19 @@ public class ApplicationServiceImpl implements ApplicationService {
             case INCOME_CERTIFICATE -> DepartmentType.REVENUE;
 
             case RESIDENCE_CERTIFICATE -> DepartmentType.HOUSING;
+        };
+    }
 
-            case WATER_CONNECTION_PERMIT -> DepartmentType.WATER;
+    private DepartmentType getPermitDepartment(PermitType permitType) {
 
-            case BUILDING_PERMIT -> DepartmentType.HOUSING;
+        return switch (permitType) {
 
             case TRADE_LICENSE,
                  SHOP_LICENSE -> DepartmentType.MUNICIPALITY;
+
+            case BUILDING_PERMIT -> DepartmentType.HOUSING;
+
+            case WATER_CONNECTION_PERMIT -> DepartmentType.WATER;
         };
     }
 }

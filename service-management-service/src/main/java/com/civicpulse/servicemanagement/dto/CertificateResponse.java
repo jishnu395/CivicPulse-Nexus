@@ -4,8 +4,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -17,5 +16,9 @@ public class CertificateResponse {
 
     private LocalDateTime issueDate;
 
+    private String digitalSignature;
+
     private String pdfUrl;
+
+    private Long applicationId;
 }

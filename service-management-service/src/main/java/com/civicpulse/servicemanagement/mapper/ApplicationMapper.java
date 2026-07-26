@@ -14,6 +14,7 @@ public class ApplicationMapper {
                 .applicationNo(application.getApplicationNo())
                 .citizenId(application.getCitizenId())
                 .certificateType(application.getCertificateType())
+                .permitType(application.getPermitType())
                 .department(application.getDepartment())
                 .status(application.getStatus())
                 .submissionDate(application.getSubmissionDate())

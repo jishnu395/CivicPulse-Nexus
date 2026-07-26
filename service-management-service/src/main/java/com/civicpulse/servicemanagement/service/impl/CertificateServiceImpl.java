@@ -7,25 +7,24 @@ import com.civicpulse.servicemanagement.enums.ApplicationStatus;
 import com.civicpulse.servicemanagement.exception.BadRequestException;
 import com.civicpulse.servicemanagement.exception.ResourceNotFoundException;
 import com.civicpulse.servicemanagement.kafka.ApplicationEventProducer;
+import com.civicpulse.servicemanagement.mapper.CertificateMapper;
 import com.civicpulse.servicemanagement.repository.ApplicationRepository;
 import com.civicpulse.servicemanagement.repository.CertificateRepository;
 import com.civicpulse.servicemanagement.service.CertificateService;
-import com.civicpulse.servicemanagement.service.PdfService;
-import com.civicpulse.servicemanagement.util.CertificateNumberGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class CertificateServiceImpl implements CertificateService {
 
-    private final ApplicationRepository applicationRepository;
     private final CertificateRepository certificateRepository;
-    private final PdfService pdfService;
+    private final ApplicationRepository applicationRepository;
+    private final CertificateMapper certificateMapper;
     private final ApplicationEventProducer eventProducer;
-
 
     @Override
     public CertificateResponse generateCertificate(Long applicationId) {
@@ -33,36 +32,36 @@ public class CertificateServiceImpl implements CertificateService {
         Application application = applicationRepository.findById(applicationId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
-                                "Application not found."));
+                                "Application not found with id : " + applicationId));
 
         if (application.getStatus() != ApplicationStatus.APPROVED) {
-
             throw new BadRequestException(
-                    "Application must be approved.");
+                    "Application must be APPROVED before generating certificate.");
         }
 
-        if (certificateRepository.findByApplication_Id(applicationId).isPresent()) {
+        certificateRepository.findByApplication_Id(applicationId)
+                .ifPresent(c -> {
+                    throw new BadRequestException(
+                            "Certificate already generated.");
+                });
 
-            throw new BadRequestException(
-                    "Certificate already exists.");
-        }
-
-        String pdfPath = pdfService.generateCertificate(application);
+        String certificateNo =
+                "CERT-" +
+                        LocalDateTime.now().getYear() +
+                        "-" +
+                        UUID.randomUUID().toString().substring(0, 8).toUpperCase();
 
         Certificate certificate = Certificate.builder()
-                .certificateNo(CertificateNumberGenerator.generate())
+                .certificateNo(certificateNo)
                 .issueDate(LocalDateTime.now())
-                .digitalSignature("CIVICPULSE-DIGITAL-SIGN")
-                .pdfUrl(pdfPath)
+                .digitalSignature("DIGITAL-SIGNATURE")
+                .pdfUrl("/certificates/" + certificateNo + ".pdf")
                 .application(application)
                 .build();
 
-        Certificate saved =
-                certificateRepository.save(certificate);
+        Certificate saved = certificateRepository.save(certificate);
 
-        application.setCertificate(saved);
         application.setStatus(ApplicationStatus.CERTIFICATE_GENERATED);
-
         applicationRepository.save(application);
 
         eventProducer.publish(
@@ -70,12 +69,18 @@ public class CertificateServiceImpl implements CertificateService {
                 saved.getCertificateNo()
         );
 
-        return CertificateResponse.builder()
-                .id(saved.getId())
-                .certificateNo(saved.getCertificateNo())
-                .issueDate(saved.getIssueDate())
-                .pdfUrl(saved.getPdfUrl())
-                .build();
+        return certificateMapper.toResponse(saved);
+    }
+
+    @Override
+    public CertificateResponse getCertificate(Long applicationId) {
+
+        Certificate certificate = certificateRepository.findByApplication_Id(applicationId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Certificate not found."));
+
+        return certificateMapper.toResponse(certificate);
     }
 
     @Override
@@ -83,15 +88,8 @@ public class CertificateServiceImpl implements CertificateService {
 
         Certificate certificate = certificateRepository.findByApplication_Id(applicationId)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Certificate not found for application id: " + applicationId));
+                        new ResourceNotFoundException("Certificate not found."));
 
-        return CertificateResponse.builder()
-                .id(certificate.getId())
-                .certificateNo(certificate.getCertificateNo())
-                .issueDate(certificate.getIssueDate())
-                .pdfUrl(certificate.getPdfUrl())
-                .build();
+        return certificateMapper.toResponse(certificate);
     }
-
 }

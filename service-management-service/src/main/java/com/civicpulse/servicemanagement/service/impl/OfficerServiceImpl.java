@@ -1,23 +1,19 @@
 package com.civicpulse.servicemanagement.service.impl;
 
-import com.civicpulse.servicemanagement.dto.ApplicationResponse;
-import com.civicpulse.servicemanagement.dto.ApprovalRequest;
-import com.civicpulse.servicemanagement.dto.VerifyDocumentRequest;
+import com.civicpulse.servicemanagement.dto.*;
 import com.civicpulse.servicemanagement.entity.Application;
+import com.civicpulse.servicemanagement.entity.Document;
 import com.civicpulse.servicemanagement.enums.ApplicationStatus;
+import com.civicpulse.servicemanagement.enums.VerificationStatus;
 import com.civicpulse.servicemanagement.exception.BadRequestException;
 import com.civicpulse.servicemanagement.exception.ResourceNotFoundException;
+import com.civicpulse.servicemanagement.kafka.ApplicationEventProducer;
 import com.civicpulse.servicemanagement.mapper.ApplicationMapper;
 import com.civicpulse.servicemanagement.repository.ApplicationRepository;
+import com.civicpulse.servicemanagement.repository.DocumentRepository;
 import com.civicpulse.servicemanagement.service.OfficerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import com.civicpulse.servicemanagement.dto.DocumentVerificationRequest;
-import com.civicpulse.servicemanagement.entity.Document;
-import com.civicpulse.servicemanagement.enums.VerificationStatus;
-import com.civicpulse.servicemanagement.kafka.ApplicationEventProducer;
-import com.civicpulse.servicemanagement.repository.DocumentRepository;
-import com.civicpulse.servicemanagement.dto.DocumentResponse;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,8 +23,8 @@ import java.util.List;
 public class OfficerServiceImpl implements OfficerService {
 
     private final ApplicationRepository applicationRepository;
-    private final ApplicationMapper applicationMapper;
     private final DocumentRepository documentRepository;
+    private final ApplicationMapper applicationMapper;
     private final ApplicationEventProducer eventProducer;
 
     @Override
@@ -53,7 +49,7 @@ public class OfficerServiceImpl implements OfficerService {
         Application application = applicationRepository.findById(applicationId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
-                                "Application not found with id: " + applicationId));
+                                "Application not found with id : " + applicationId));
 
         application.setStatus(
                 request.isVerified()
@@ -63,9 +59,14 @@ public class OfficerServiceImpl implements OfficerService {
 
         application.setRemarks(request.getRemarks());
 
-        Application updatedApplication = applicationRepository.save(application);
+        Application updated = applicationRepository.save(application);
 
-        return applicationMapper.toResponse(updatedApplication);
+        eventProducer.publish(
+                "application-verified",
+                updated.getApplicationNo()
+        );
+
+        return applicationMapper.toResponse(updated);
     }
 
     @Override
@@ -75,20 +76,30 @@ public class OfficerServiceImpl implements OfficerService {
         Application application = applicationRepository.findById(applicationId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
-                                "Application not found with id: " + applicationId));
+                                "Application not found with id : " + applicationId));
 
-        if (application.getStatus() != ApplicationStatus.VERIFIED) {
+        boolean allVerified = application.getDocuments()
+                .stream()
+                .allMatch(doc ->
+                        doc.getVerificationStatus() == VerificationStatus.VERIFIED);
+
+        if (!allVerified) {
             throw new BadRequestException(
-                    "Application must be VERIFIED before approval.");
+                    "All documents must be VERIFIED before approval.");
         }
 
         application.setStatus(ApplicationStatus.APPROVED);
         application.setApprovalDate(LocalDateTime.now());
         application.setRemarks(request.getRemarks());
 
-        Application updatedApplication = applicationRepository.save(application);
+        Application updated = applicationRepository.save(application);
 
-        return applicationMapper.toResponse(updatedApplication);
+        eventProducer.publish(
+                "application-approved",
+                updated.getApplicationNo()
+        );
+
+        return applicationMapper.toResponse(updated);
     }
 
     @Override
@@ -98,14 +109,19 @@ public class OfficerServiceImpl implements OfficerService {
         Application application = applicationRepository.findById(applicationId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
-                                "Application not found with id: " + applicationId));
+                                "Application not found with id : " + applicationId));
 
         application.setStatus(ApplicationStatus.REJECTED);
         application.setRemarks(request.getRemarks());
 
-        Application updatedApplication = applicationRepository.save(application);
+        Application updated = applicationRepository.save(application);
 
-        return applicationMapper.toResponse(updatedApplication);
+        eventProducer.publish(
+                "application-rejected",
+                updated.getApplicationNo()
+        );
+
+        return applicationMapper.toResponse(updated);
     }
 
     @Override
@@ -114,14 +130,12 @@ public class OfficerServiceImpl implements OfficerService {
 
         Document document = documentRepository.findById(documentId)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Document not found"));
+                        new ResourceNotFoundException(
+                                "Document not found with id : " + documentId));
 
-        if (request.getVerified()) {
-
+        if (Boolean.TRUE.equals(request.getVerified())) {
             document.setVerificationStatus(VerificationStatus.VERIFIED);
-
         } else {
-
             document.setVerificationStatus(VerificationStatus.NEEDS_CORRECTION);
         }
 
@@ -133,7 +147,8 @@ public class OfficerServiceImpl implements OfficerService {
 
         boolean allVerified = application.getDocuments()
                 .stream()
-                .allMatch(d -> d.getVerificationStatus() == VerificationStatus.VERIFIED);
+                .allMatch(doc ->
+                        doc.getVerificationStatus() == VerificationStatus.VERIFIED);
 
         if (allVerified) {
 
@@ -143,8 +158,13 @@ public class OfficerServiceImpl implements OfficerService {
 
             eventProducer.publish(
                     "document-verified",
-                    "Application " + application.getApplicationNo() + " verified"
+                    application.getApplicationNo()
             );
+        } else {
+
+            application.setStatus(ApplicationStatus.UNDER_VERIFICATION);
+
+            applicationRepository.save(application);
         }
 
         return applicationMapper.toResponse(application);
@@ -152,6 +172,11 @@ public class OfficerServiceImpl implements OfficerService {
 
     @Override
     public List<DocumentResponse> getDocuments(Long applicationId) {
+
+        applicationRepository.findById(applicationId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Application not found with id : " + applicationId));
 
         return documentRepository.findByApplication_Id(applicationId)
                 .stream()

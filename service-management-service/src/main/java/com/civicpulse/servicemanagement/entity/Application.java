@@ -3,6 +3,7 @@ package com.civicpulse.servicemanagement.entity;
 import com.civicpulse.servicemanagement.enums.ApplicationStatus;
 import com.civicpulse.servicemanagement.enums.CertificateType;
 import com.civicpulse.servicemanagement.enums.DepartmentType;
+import com.civicpulse.servicemanagement.enums.PermitType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,8 +31,12 @@ public class Application {
     private Long citizenId;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = true)
     private CertificateType certificateType;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = true)
+    private PermitType permitType;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

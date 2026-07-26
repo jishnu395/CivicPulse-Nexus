@@ -3,6 +3,7 @@ package com.civicpulse.servicemanagement.dto;
 import com.civicpulse.servicemanagement.enums.ApplicationStatus;
 import com.civicpulse.servicemanagement.enums.CertificateType;
 import com.civicpulse.servicemanagement.enums.DepartmentType;
+import com.civicpulse.servicemanagement.enums.PermitType;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -21,6 +22,8 @@ public class ApplicationResponse {
     private Long citizenId;
 
     private CertificateType certificateType;
+
+    private PermitType permitType;
 
     private DepartmentType department;
 

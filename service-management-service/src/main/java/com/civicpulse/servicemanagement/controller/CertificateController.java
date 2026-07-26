@@ -21,11 +21,11 @@ public class CertificateController {
                 certificateService.generateCertificate(applicationId));
     }
 
-    @GetMapping("/download/{applicationId}")
-    public ResponseEntity<CertificateResponse> downloadCertificate(
+    @GetMapping("/{applicationId}")
+    public ResponseEntity<CertificateResponse> getCertificate(
             @PathVariable Long applicationId) {
 
         return ResponseEntity.ok(
-                certificateService.downloadCertificate(applicationId));
+                certificateService.getCertificate(applicationId));
     }
 }
