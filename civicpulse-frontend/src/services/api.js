@@ -24,7 +24,7 @@ export const citizenAPI = {
         api.get(`/api/citizens/status/${status}`),
 
     getByEmail: (email) =>
-    api.get(`/api/citizens/email/${email}`)
+        api.get(`/api/citizens/email/${email}`)
 };
 
 export const certificateAPI = {
@@ -32,15 +32,18 @@ export const certificateAPI = {
     dashboard: () =>
         api.get("/api/dashboard"),
 
+    // Certificate Application
     apply: (data) =>
         api.post("/api/certificates/apply", data),
 
+    // Common Application APIs
     getMy: (citizenId) =>
-        api.get(`/api/certificates/my/${citizenId}`),
+        api.get(`/api/applications/my/${citizenId}`),
 
     getById: (id) =>
-        api.get(`/api/certificates/${id}`),
+        api.get(`/api/applications/${id}`),
 
+    // Officer APIs
     pending: () =>
         api.get("/api/officer/pending"),
 
@@ -56,11 +59,35 @@ export const certificateAPI = {
     reject: (id, data) =>
         api.put(`/api/officer/reject/${id}`, data),
 
+    // Certificate Generation
     generate: (id) =>
         api.post(`/api/certificate/generate/${id}`),
 
     download: (applicationId) =>
-    api.get(`/api/certificate/download/${applicationId}`),
+        api.get(`/api/certificate/download/${applicationId}`),
+
+    verifyDocument: (documentId, data) =>
+    api.put(`/api/officer/document/${documentId}`, data)
+};
+
+export const permitAPI = {
+
+    apply: (data) =>
+        api.post("/api/applications/permits/apply", data),
+
+    // Common Application APIs
+    getMy: (citizenId) =>
+        api.get(`/api/applications/my/${citizenId}`),
+
+    getById: (id) =>
+        api.get(`/api/applications/${id}`),
+
+    // Permit Generation
+    generate: (id) =>
+        api.post(`/api/permit/generate/${id}`),
+
+    download: (applicationId) =>
+        api.get(`/api/permit/download/${applicationId}`)
 };
 
 export const grievanceAPI = {

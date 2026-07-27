@@ -65,6 +65,12 @@ public class Application {
     )
     private Certificate certificate;
 
+    @OneToOne(
+            mappedBy = "application",
+            cascade = CascadeType.ALL
+    )
+    private Permit permit;
+
     @Column(length = 1000)
     private String remarks;
 }

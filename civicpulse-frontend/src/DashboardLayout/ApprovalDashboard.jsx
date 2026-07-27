@@ -26,9 +26,11 @@ export default function ApprovalDashboard() {
   const loadApplications = async () => {
     try {
       const res = await certificateAPI.pending();
+
       setApplications(
         res.data.filter(app => app.status === "VERIFIED")
       );
+
     } catch (err) {
       console.error(err);
     }
@@ -48,7 +50,8 @@ export default function ApprovalDashboard() {
             <TableRow>
               <TableCell>Application No</TableCell>
               <TableCell>Citizen</TableCell>
-              <TableCell>Certificate</TableCell>
+              <TableCell>Service</TableCell>
+              <TableCell>Department</TableCell>
               <TableCell>Status</TableCell>
               <TableCell align="center">Action</TableCell>
             </TableRow>
@@ -56,13 +59,20 @@ export default function ApprovalDashboard() {
 
           <TableBody>
 
-            {applications.map(app => (
+            {applications.map((app) => (
 
               <TableRow key={app.id}>
 
                 <TableCell>{app.applicationNo}</TableCell>
+
                 <TableCell>{app.citizenId}</TableCell>
-                <TableCell>{app.certificateType}</TableCell>
+
+                <TableCell>
+                  {app.certificateType || app.permitType}
+                </TableCell>
+
+                <TableCell>{app.department}</TableCell>
+
                 <TableCell>{app.status}</TableCell>
 
                 <TableCell align="center">

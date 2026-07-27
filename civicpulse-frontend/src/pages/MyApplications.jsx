@@ -37,7 +37,9 @@ export default function MyApplications() {
 
             const response = await certificateAPI.getMy(citizen.data.id);
 
-            setApplications(response.data);
+            setApplications(
+                response.data.filter(app => app.certificateType !== null)
+            );
 
         } catch (error) {
 

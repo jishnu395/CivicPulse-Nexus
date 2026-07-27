@@ -23,6 +23,8 @@ import Verification from "../pages/Verification";
 import Approval from "../pages/Approval";
 import OfficerDashboard from "../DashboardLayout/OfficerDashboard";
 import ApprovalDashboard from "../DashboardLayout/ApprovalDashboard";
+import ApplyPermit from "../pages/ApplyPermit";
+import MyPermits from "../pages/MyPermits";
 
 export default function AppRoutes() {
 
@@ -185,6 +187,16 @@ export default function AppRoutes() {
             />
 
             <Route
+                path="/apply-permit"
+                element={<ApplyPermit />}
+            />
+
+            <Route
+                path="/my-permits"
+                element={<MyPermits />}
+            />
+
+            <Route
                 path="/apply-certificate"
                 element={
                     <ProtectedRoute>
@@ -208,6 +220,8 @@ export default function AppRoutes() {
             />
 
         </Routes>
+
+        
 
     );
 

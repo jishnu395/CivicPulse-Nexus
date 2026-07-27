@@ -28,4 +28,12 @@ public class CertificateController {
         return ResponseEntity.ok(
                 certificateService.getCertificate(applicationId));
     }
+
+    @GetMapping("/download/{applicationId}")
+    public ResponseEntity<CertificateResponse> downloadCertificate(
+            @PathVariable Long applicationId) {
+
+        return ResponseEntity.ok(
+                certificateService.downloadCertificate(applicationId));
+    }
 }

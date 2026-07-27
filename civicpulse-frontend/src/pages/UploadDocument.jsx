@@ -21,42 +21,49 @@ export default function UploadDocument() {
 
     const upload = async () => {
 
-        if (!file) {
-            toast.error("Select a document");
-            return;
-        }
+    if (!file) {
+        toast.error("Select a document");
+        return;
+    }
 
-        try {
+    try {
 
-            const formData = new FormData();
+        const formData = new FormData();
 
-            formData.append("file", file);
+        formData.append("file", file);
 
-            await api.post(
-                `/api/documents/upload/${applicationId}`,
-                formData,
-                {
-                    headers: {
-                        "Content-Type": "multipart/form-data"
-                    }
+        await api.post(
+            `/api/documents/upload/${applicationId}`,
+            formData,
+            {
+                headers: {
+                    "Content-Type": "multipart/form-data"
                 }
-            );
+            }
+        );
 
-            toast.success("Document Uploaded");
+        toast.success("Document Uploaded");
 
+        const response = await api.get(
+            `/api/applications/${applicationId}`
+        );
+
+        if (response.data.permitType) {
+            navigate("/my-permits");
+        } else {
             navigate("/my-applications");
-
-        } catch (error) {
-
-            toast.error(
-                error?.response?.data?.message ||
-                "Upload failed."
-            );
-
         }
 
-    };
+    } catch (error) {
 
+        toast.error(
+            error?.response?.data?.message ||
+            "Upload failed."
+        );
+
+    }
+
+};
     return (
 
         <Container maxWidth="sm" sx={{ mt: 5 }}>

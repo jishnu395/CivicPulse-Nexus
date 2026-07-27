@@ -8,7 +8,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
-import { certificateAPI } from "../services/api";
+import { certificateAPI, permitAPI } from "../services/api";
 
 export default function Approval() {
 
@@ -65,11 +65,21 @@ export default function Approval() {
   const handleGenerate = async () => {
     try {
 
-      await certificateAPI.generate(id);
+      if (application.permitType) {
 
-      alert("Certificate Generated");
+        await permitAPI.generate(id);
 
-      navigate("/approval/dashboard");
+        alert("Permit Generated");
+
+      } else {
+
+        await certificateAPI.generate(id);
+
+        alert("Certificate Generated");
+
+      }
+
+      loadApplication();
 
     } catch (err) {
       console.error(err);
@@ -97,7 +107,8 @@ export default function Approval() {
           </Typography>
 
           <Typography>
-            <b>Certificate:</b> {application.certificateType}
+            <b>Service:</b>{" "}
+            {application.certificateType || application.permitType}
           </Typography>
 
           <Typography>
@@ -133,7 +144,9 @@ export default function Approval() {
               disabled={application.status !== "APPROVED"}
               onClick={handleGenerate}
             >
-              Generate Certificate
+              {application.permitType
+                ? "Generate Permit"
+                : "Generate Certificate"}
             </Button>
 
           </Stack>

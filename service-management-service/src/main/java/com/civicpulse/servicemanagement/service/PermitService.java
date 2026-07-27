@@ -1,21 +1,13 @@
 package com.civicpulse.servicemanagement.service;
 
-import com.civicpulse.servicemanagement.dto.ApplicationResponse;
-import com.civicpulse.servicemanagement.dto.PermitApplicationRequest;
-
-import java.util.List;
+import com.civicpulse.servicemanagement.dto.PermitResponse;
 
 public interface PermitService {
 
-    ApplicationResponse applyPermit(PermitApplicationRequest request);
+    PermitResponse generatePermit(Long applicationId);
 
-    List<ApplicationResponse> getMyPermits(Long citizenId);
+    PermitResponse downloadPermit(Long applicationId);
 
-    List<ApplicationResponse> getPendingPermits();
+    PermitResponse getPermit(Long applicationId);
 
-    ApplicationResponse approvePermit(Long applicationId);
-
-    ApplicationResponse rejectPermit(Long applicationId);
-
-    ApplicationResponse getPermit(Long applicationId);
 }

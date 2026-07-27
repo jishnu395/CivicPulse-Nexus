@@ -61,6 +61,21 @@ export default function CitizenDashboard() {
                 </Button>
 
                 <Button
+                    variant="contained"
+                    color="warning"
+                    onClick={() => navigate("/apply-permit")}
+                >
+                    Apply Permit
+                </Button>
+
+                <Button
+                    variant="outlined"
+                    onClick={() => navigate("/my-permits")}
+                >
+                    My Permits
+                </Button>
+
+                <Button
                     variant="outlined"
                     onClick={() => navigate("/my-applications")}
                 >

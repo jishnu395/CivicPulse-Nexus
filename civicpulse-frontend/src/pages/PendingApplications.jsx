@@ -43,7 +43,7 @@ export default function PendingApplications() {
             <TableRow>
               <TableCell>Application No</TableCell>
               <TableCell>Citizen ID</TableCell>
-              <TableCell>Certificate</TableCell>
+              <TableCell>Service</TableCell>
               <TableCell>Department</TableCell>
               <TableCell>Status</TableCell>
               <TableCell align="center">Action</TableCell>
@@ -54,17 +54,21 @@ export default function PendingApplications() {
             {applications.map((app) => (
               <TableRow key={app.id}>
                 <TableCell>{app.applicationNo}</TableCell>
+
                 <TableCell>{app.citizenId}</TableCell>
-                <TableCell>{app.certificateType}</TableCell>
+
+                <TableCell>
+                  {app.certificateType || app.permitType}
+                </TableCell>
+
                 <TableCell>{app.department}</TableCell>
+
                 <TableCell>{app.status}</TableCell>
 
                 <TableCell align="center">
                   <Button
                     variant="contained"
-                    onClick={() =>
-                      navigate(`/verification/${app.id}`)
-                    }
+                    onClick={() => navigate(`/verification/${app.id}`)}
                   >
                     Verify
                   </Button>

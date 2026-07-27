@@ -45,35 +45,52 @@ export default function Verification() {
     }
   };
 
-  const handleVerify = async () => {
+const handleVerify = async () => {
     try {
-      await certificateAPI.verify(id, {
-        verified: true,
-        remarks: "Documents verified successfully",
-      });
 
-      alert("Application Verified");
-      navigate(-1);
+        for (const doc of documents) {
+
+            await certificateAPI.verifyDocument(doc.id, {
+                verified: true,
+                remarks: "Verified"
+            });
+
+        }
+
+        alert("Documents verified successfully");
+
+        loadApplication();
+        loadDocuments();
+
+        navigate(-1);
 
     } catch (err) {
-      console.error(err);
+        console.error(err);
     }
-  };
+};
 
-  const handleCorrection = async () => {
+const handleCorrection = async () => {
+
     try {
-      await certificateAPI.verify(id, {
-        verified: false,
-        remarks: "Please upload correct documents",
-      });
 
-      alert("Marked for correction");
-      navigate(-1);
+        for (const doc of documents) {
+
+            await certificateAPI.verifyDocument(doc.id, {
+                verified: false,
+                remarks: "Need Correction"
+            });
+
+        }
+
+        alert("Marked for correction");
+
+        navigate(-1);
 
     } catch (err) {
-      console.error(err);
+        console.error(err);
     }
-  };
+
+};
 
   if (!application) return null;
 
@@ -95,9 +112,12 @@ export default function Verification() {
             <b>Citizen ID:</b> {application.citizenId}
           </Typography>
 
-          <Typography>
-            <b>Certificate:</b> {application.certificateType}
-          </Typography>
+<Typography>
+  <b>
+    {application.certificateType ? "Certificate" : "Permit"}:
+  </b>{" "}
+  {application.certificateType || application.permitType}
+</Typography>
 
           <Typography>
             <b>Department:</b> {application.department}
