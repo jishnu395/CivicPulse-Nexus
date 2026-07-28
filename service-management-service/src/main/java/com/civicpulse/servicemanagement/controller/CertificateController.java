@@ -3,6 +3,8 @@ package com.civicpulse.servicemanagement.controller;
 import com.civicpulse.servicemanagement.dto.CertificateResponse;
 import com.civicpulse.servicemanagement.service.CertificateService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,10 +32,15 @@ public class CertificateController {
     }
 
     @GetMapping("/download/{applicationId}")
-    public ResponseEntity<CertificateResponse> downloadCertificate(
+    public ResponseEntity<byte[]> downloadCertificate(
             @PathVariable Long applicationId) {
 
-        return ResponseEntity.ok(
-                certificateService.downloadCertificate(applicationId));
+        byte[] pdf = certificateService.downloadCertificatePdf(applicationId);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=Certificate.pdf")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdf);
     }
 }

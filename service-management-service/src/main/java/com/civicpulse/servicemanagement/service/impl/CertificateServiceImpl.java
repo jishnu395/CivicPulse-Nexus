@@ -11,9 +11,15 @@ import com.civicpulse.servicemanagement.mapper.CertificateMapper;
 import com.civicpulse.servicemanagement.repository.ApplicationRepository;
 import com.civicpulse.servicemanagement.repository.CertificateRepository;
 import com.civicpulse.servicemanagement.service.CertificateService;
+import com.lowagie.text.Document;
+import com.lowagie.text.Font;
+import com.lowagie.text.FontFactory;
+import com.lowagie.text.Paragraph;
+import com.lowagie.text.pdf.PdfWriter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayOutputStream;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -77,8 +83,7 @@ public class CertificateServiceImpl implements CertificateService {
 
         Certificate certificate = certificateRepository.findByApplication_Id(applicationId)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Certificate not found."));
+                        new ResourceNotFoundException("Certificate not found."));
 
         return certificateMapper.toResponse(certificate);
     }
@@ -91,5 +96,47 @@ public class CertificateServiceImpl implements CertificateService {
                         new ResourceNotFoundException("Certificate not found."));
 
         return certificateMapper.toResponse(certificate);
+    }
+
+    @Override
+    public byte[] downloadCertificatePdf(Long applicationId) {
+
+        Certificate certificate = certificateRepository.findByApplication_Id(applicationId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Certificate not found."));
+
+        try {
+
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+            Document document = new Document();
+
+            PdfWriter.getInstance(document, out);
+
+            document.open();
+
+            Font title = FontFactory.getFont(
+                    FontFactory.HELVETICA_BOLD,
+                    20
+            );
+
+            document.add(new Paragraph("CIVICPULSE NEXUS", title));
+            document.add(new Paragraph(" "));
+            document.add(new Paragraph("CERTIFICATE"));
+            document.add(new Paragraph(" "));
+            document.add(new Paragraph("Certificate Number : " + certificate.getCertificateNo()));
+            document.add(new Paragraph("Issue Date : " + certificate.getIssueDate()));
+            document.add(new Paragraph("Application ID : " + certificate.getApplication().getId()));
+            document.add(new Paragraph("Certificate Type : " + certificate.getApplication().getCertificateType()));
+            document.add(new Paragraph("Department : " + certificate.getApplication().getDepartment()));
+            document.add(new Paragraph("Digital Signature : " + certificate.getDigitalSignature()));
+
+            document.close();
+
+            return out.toByteArray();
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to generate PDF", e);
+        }
     }
 }

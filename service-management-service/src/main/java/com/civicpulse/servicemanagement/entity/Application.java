@@ -31,11 +31,9 @@ public class Application {
     private Long citizenId;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = true)
     private CertificateType certificateType;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = true)
     private PermitType permitType;
 
     @Enumerated(EnumType.STRING)
@@ -54,20 +52,23 @@ public class Application {
     @OneToMany(
             mappedBy = "application",
             cascade = CascadeType.ALL,
-            orphanRemoval = true
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
     )
     @Builder.Default
     private List<Document> documents = new ArrayList<>();
 
     @OneToOne(
             mappedBy = "application",
-            cascade = CascadeType.ALL
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY
     )
     private Certificate certificate;
 
     @OneToOne(
             mappedBy = "application",
-            cascade = CascadeType.ALL
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY
     )
     private Permit permit;
 

@@ -14,8 +14,15 @@ import com.civicpulse.servicemanagement.service.PermitService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayOutputStream;
 import java.time.LocalDateTime;
 import java.util.UUID;
+
+import com.lowagie.text.Document;
+import com.lowagie.text.Font;
+import com.lowagie.text.FontFactory;
+import com.lowagie.text.Paragraph;
+import com.lowagie.text.pdf.PdfWriter;
 
 @Service
 @RequiredArgsConstructor
@@ -54,7 +61,7 @@ public class PermitServiceImpl implements PermitService {
                 "PERMIT-" +
                         LocalDateTime.now().getYear() +
                         "-" +
-                        UUID.randomUUID().toString().substring(0,8).toUpperCase();
+                        UUID.randomUUID().toString().substring(0, 8).toUpperCase();
 
         Permit permit = Permit.builder()
                 .permitNo(permitNo)
@@ -67,7 +74,6 @@ public class PermitServiceImpl implements PermitService {
         Permit saved = permitRepository.save(permit);
 
         application.setStatus(ApplicationStatus.CERTIFICATE_GENERATED);
-
         applicationRepository.save(application);
 
         eventProducer.publish(
@@ -76,7 +82,6 @@ public class PermitServiceImpl implements PermitService {
         );
 
         return permitMapper.toResponse(saved);
-
     }
 
     @Override
@@ -88,7 +93,6 @@ public class PermitServiceImpl implements PermitService {
                                 "Permit not found."));
 
         return permitMapper.toResponse(permit);
-
     }
 
     @Override
@@ -100,7 +104,47 @@ public class PermitServiceImpl implements PermitService {
                                 "Permit not found."));
 
         return permitMapper.toResponse(permit);
-
     }
 
+    @Override
+    public byte[] downloadPermitPdf(Long applicationId) {
+
+        Permit permit = permitRepository.findByApplication_Id(applicationId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Permit not found."));
+
+        try {
+
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+            Document document = new Document();
+
+            PdfWriter.getInstance(document, out);
+
+            document.open();
+
+            Font title = FontFactory.getFont(
+                    FontFactory.HELVETICA_BOLD,
+                    20
+            );
+
+            document.add(new Paragraph("CIVICPULSE NEXUS", title));
+            document.add(new Paragraph(" "));
+            document.add(new Paragraph("PERMIT"));
+            document.add(new Paragraph(" "));
+            document.add(new Paragraph("Permit Number : " + permit.getPermitNo()));
+            document.add(new Paragraph("Issue Date : " + permit.getIssueDate()));
+            document.add(new Paragraph("Application ID : " + permit.getApplication().getId()));
+            document.add(new Paragraph("Permit Type : " + permit.getApplication().getPermitType()));
+            document.add(new Paragraph("Department : " + permit.getApplication().getDepartment()));
+            document.add(new Paragraph("Digital Signature : " + permit.getDigitalSignature()));
+
+            document.close();
+
+            return out.toByteArray();
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to generate PDF", e);
+        }
+    }
 }

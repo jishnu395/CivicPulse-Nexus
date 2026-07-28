@@ -6,7 +6,9 @@ public interface CertificateService {
 
     CertificateResponse generateCertificate(Long applicationId);
 
+    CertificateResponse getCertificate(Long applicationId);
+
     CertificateResponse downloadCertificate(Long applicationId);
 
-    CertificateResponse getCertificate(Long applicationId);
+    byte[] downloadCertificatePdf(Long applicationId);
 }

@@ -16,6 +16,7 @@ import {
 
 import { certificateAPI, citizenAPI } from "../services/api";
 import { getUser } from "../utils/auth";
+import api from "../api/axios";
 
 export default function MyApplications() {
 
@@ -51,30 +52,41 @@ export default function MyApplications() {
 
     const handleDownload = async (applicationId) => {
 
-        try {
+    try {
 
-            const response = await certificateAPI.download(applicationId);
-
-            const pdfUrl = response.data.pdfUrl;
-
-            if (!pdfUrl) {
-                alert("Certificate not generated.");
-                return;
+        const response = await api.get(
+            `/api/certificate/download/${applicationId}`,
+            {
+                responseType: "blob"
             }
+        );
 
-            window.open(
-                `http://localhost:8084/${pdfUrl}`,
-                "_blank"
-            );
+        const url = window.URL.createObjectURL(
+            new Blob([response.data], { type: "application/pdf" })
+        );
 
-        } catch (error) {
+        const link = document.createElement("a");
 
-            console.error(error);
-            alert("Unable to download certificate.");
+        link.href = url;
+        link.download = "Certificate.pdf";
 
-        }
+        document.body.appendChild(link);
 
-    };
+        link.click();
+
+        document.body.removeChild(link);
+
+        window.URL.revokeObjectURL(url);
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert("Unable to download certificate.");
+
+    }
+
+};
 
     return (
 

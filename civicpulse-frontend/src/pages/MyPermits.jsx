@@ -14,6 +14,7 @@ import {
     Typography
 } from "@mui/material";
 
+import api from "../api/axios";
 import { permitAPI, citizenAPI } from "../services/api";
 import { getUser } from "../utils/auth";
 
@@ -38,10 +39,6 @@ export default function MyPermits() {
             const response = await permitAPI.getMy(citizen.data.id);
 
             // Show only permit applications
-            const permits = response.data.filter(
-                app => app.permitType !== null
-            );
-
             setApplications(
                 response.data.filter(app => app.permitType !== null)
             );
@@ -56,33 +53,41 @@ export default function MyPermits() {
 
     const handleDownload = async (applicationId) => {
 
-        try {
+    try {
 
-            const response = await permitAPI.download(applicationId);
-
-            const pdfUrl = response.data.pdfUrl;
-
-            if (!pdfUrl) {
-
-                alert("Permit not generated.");
-
-                return;
+        const response = await api.get(
+            `/api/permit/download/${applicationId}`,
+            {
+                responseType: "blob",
             }
+        );
 
-            window.open(
-                `http://localhost:8084${pdfUrl}`,
-                "_blank"
-            );
+        const url = window.URL.createObjectURL(
+            new Blob([response.data], { type: "application/pdf" })
+        );
 
-        } catch (error) {
+        const link = document.createElement("a");
 
-            console.error(error);
+        link.href = url;
+        link.download = "Permit.pdf";
 
-            alert("Unable to download permit.");
+        document.body.appendChild(link);
 
-        }
+        link.click();
 
-    };
+        document.body.removeChild(link);
+
+        window.URL.revokeObjectURL(url);
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert("Download failed.");
+
+    }
+
+};
 
     return (
 

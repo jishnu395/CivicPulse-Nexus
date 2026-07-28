@@ -6,8 +6,10 @@ public interface PermitService {
 
     PermitResponse generatePermit(Long applicationId);
 
+    PermitResponse getPermit(Long applicationId);
+
     PermitResponse downloadPermit(Long applicationId);
 
-    PermitResponse getPermit(Long applicationId);
+    byte[] downloadPermitPdf(Long applicationId);
 
 }

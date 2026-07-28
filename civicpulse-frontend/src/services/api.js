@@ -33,8 +33,9 @@ export const certificateAPI = {
         api.get("/api/dashboard"),
 
     // Certificate Application
+// Certificate Application
     apply: (data) =>
-        api.post("/api/certificates/apply", data),
+        api.post("/api/applications/certificates/apply", data), 
 
     // Common Application APIs
     getMy: (citizenId) =>
