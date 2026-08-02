@@ -12,4 +12,6 @@ public interface WelfareApplicationRepository
     List<WelfareApplication> findByCitizenId(Long citizenId);
 
     List<WelfareApplication> findByStatus(ApplicationStatus status);
+
+    boolean existsByCitizenIdAndWelfareScheme_Id(Long citizenId, Long schemeId);
 }

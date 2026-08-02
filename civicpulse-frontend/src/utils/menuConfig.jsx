@@ -8,33 +8,68 @@ import LogoutIcon from "@mui/icons-material/Logout";
 
 const menuConfig = {
 
-    ADMIN: [
-        {
-            text: "Dashboard",
-            icon: <DashboardIcon />,
-            path: "/admin/dashboard"
-        },
-        {
-            text: "Citizens",
-            icon: <PeopleIcon />,
-            path: "/citizens"
-        },
-        {
-            text: "Grievances",
-            icon: <ReportIcon />,
-            path: "/grievances"
-        },
-        {
-            text: "Reports",
-            icon: <AssessmentIcon />,
-            path: "/reports"
-        },
-        {
-            text: "Logout",
-            icon: <LogoutIcon />,
-            path: "logout"
-        }
-    ],
+ADMIN: [
+    {
+        text: "Dashboard",
+        icon: <DashboardIcon />,
+        path: "/admin/dashboard"
+    },
+    {
+        text: "Citizens",
+        icon: <PeopleIcon />,
+        path: "/citizens"
+    },
+    {
+        text: "Grievances",
+        icon: <ReportIcon />,
+        path: "/grievances"
+    },
+    {
+        text: "Welfare Schemes",
+        icon: <AssessmentIcon />,
+        path: "/welfare-schemes"
+    },
+    {
+        text: "Beneficiaries",
+        icon: <PeopleIcon />,
+        path: "/beneficiaries"
+    },
+    {
+        text: "Applications",
+        icon: <AssessmentIcon />,
+        path: "/welfare-applications"
+    },
+    {
+        text: "Budgets",
+        icon: <AssessmentIcon />,
+        path: "/budgets"
+    },
+    {
+        text: "Expenses",
+        icon: <AssessmentIcon />,
+        path: "/expenses"
+    },
+    {
+        text: "Fund Distribution",
+        icon: <AssessmentIcon />,
+        path: "/fund-distributions"
+    },
+    {
+        text: "Analytics",
+        icon: <AssessmentIcon />,
+        path: "/analytics"
+    },
+    {
+        text: "Audit Logs",
+        icon: <AssessmentIcon />,
+        path: "/audit"
+    },
+    {
+        text: "Logout",
+        icon: <LogoutIcon />,
+        path: "logout"
+    }
+],
 
     OFFICER: [
         {

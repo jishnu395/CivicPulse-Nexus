@@ -10,4 +10,7 @@ public interface WelfareFeignClient {
     @GetMapping("/api/welfare/schemes/{id}")
     Object getScheme(@PathVariable Long id);
 
+    @GetMapping("/api/welfare/beneficiaries/{id}")
+    Object getBeneficiary(@PathVariable Long id);
+
 }

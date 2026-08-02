@@ -1,259 +1,499 @@
-# CivicPulse Nexus - Frontend
+# CivicPulse Nexus
 
-A React-based frontend for **CivicPulse Nexus**, a Smart City Grievance Management System built using a **Microservices Architecture**.
-
-This frontend interacts with the Citizen Service and Grievance Service to provide a simple interface for managing citizens, grievances, and dashboard statistics.
+> A cloud-native Smart Governance platform built as a **solo full-stack project** using **Spring Boot Microservices**, **React**, **PostgreSQL**, **Kafka**, **Keycloak**, and **Docker** to digitize citizen services and improve transparency, accountability, and operational efficiency in government administration.
 
 ---
 
-## 🚀 Features
+## Overview
 
-- Login Page (UI)
-- Home Dashboard
-- Register Citizen
-- View Citizens
-- Register Grievance
-- View Grievances
-- Dashboard Statistics
-- React Router Navigation
-- Material UI Components
-- Axios API Integration
-- Responsive Layout
+CivicPulse Nexus is an enterprise-grade Smart Governance platform that provides a centralized digital ecosystem for citizens, government officers, and administrators.
+
+The platform replaces manual government processes with secure digital workflows for grievance management, certificate issuance, permit processing, welfare administration, and budget management.
+
+The system follows a **microservices architecture**, ensuring scalability, modularity, fault isolation, and easier maintenance.
 
 ---
 
-## 🏗️ Tech Stack
+# Features
+
+## Authentication & Authorization
+
+- Keycloak Authentication
+- JWT-based Security
+- OAuth2 Integration
+- Role-Based Access Control (RBAC)
+- Admin, Officer, and Citizen Roles
+
+---
+
+## Citizen Services
+
+- Citizen Registration
+- Complaint Registration
+- Complaint Tracking
+- Certificate Applications
+- Permit Applications
+- Welfare Scheme Applications
+- Document Upload
+- Application Status Tracking
+
+---
+
+## Officer Services
+
+- Document Verification
+- Certificate Approval / Rejection
+- Permit Approval / Rejection
+- Complaint Status Management
+- Application Processing
+
+---
+
+## Admin Services
+
+- Welfare Scheme Management
+- Beneficiary Management
+- Budget Management
+- Budget Allocation
+- Expense Management
+- Fund Distribution
+- Analytics Dashboard
+- Audit Monitoring
+- Grievance Monitoring
+
+---
+
+# System Architecture
+
+```
+                     React Frontend
+                           │
+                    API Gateway (8080)
+                           │
+          ───────────────────────────────────
+           Eureka Discovery Server (8761)
+          ───────────────────────────────────
+                           │
+     ┌───────────────────────────────────────────┐
+     │                                           │
+ User Service          Citizen Service
+ Grievance Service     Service Management Service
+ Welfare Service       Budget Service
+     │
+ PostgreSQL Databases
+     │
+ Apache Kafka
+```
+
+---
+
+# Tech Stack
+
+## Frontend
 
 - React (Vite)
-- React Router DOM
 - Material UI
+- React Router
 - Axios
-- JavaScript
-- CSS
 
----
+## Backend
 
-## 📂 Project Structure
+- Java 21
+- Spring Boot
+- Spring Security
+- Spring Cloud Gateway
+- Spring Data JPA
+- OpenFeign
+- Hibernate
+- Maven
 
-```
-src/
-│
-├── pages/
-│   ├── Login.jsx
-│   ├── Home.jsx
-│   ├── RegisterCitizen.jsx
-│   ├── CitizenList.jsx
-│   ├── RegisterGrievance.jsx
-│   ├── GrievanceList.jsx
-│   ├── Dashboard.jsx
-│   └── GrievanceHistory.jsx
-│
-├── routes/
-│   └── AppRoutes.jsx
-│
-├── services/
-│   └── api.js
-│
-├── App.jsx
-└── main.jsx
-```
-
----
-
-## 🌐 Backend Services
-
-The frontend communicates with the following backend services.
-
-| Service | Port |
-|----------|------|
-| Citizen Service | 8082 |
-| Grievance Service | 8083 |
-
-Axios configuration:
-
-```javascript
-export const citizenAPI = axios.create({
-    baseURL: "http://localhost:8082/api/citizens"
-});
-
-export const grievanceAPI = axios.create({
-    baseURL: "http://localhost:8083/api/grievances"
-});
-```
-
----
-
-## 📋 Available Pages
-
-### Login
-
-Simple login interface for CivicPulse Nexus.
-
----
-
-### Home
-
-Provides navigation to all available modules.
-
-- Register Citizen
-- View Citizens
-- Register Grievance
-- View Grievances
-- Dashboard
-
----
-
-### Register Citizen
-
-Allows creation of a citizen profile linked to an existing registered user.
-
-Fields:
-
-- User ID
-- First Name
-- Last Name
-- Phone Number
-- Gender
-- Date of Birth
-- Address
-- Ward Number
-- City
-- State
-- Postal Code
-
----
-
-### View Citizens
-
-Displays all registered citizens in a Material UI table.
-
-Columns:
-
-- ID
-- Citizen ID
-- Name
-- Phone Number
-- Ward
-- Status
-
----
-
-### Register Grievance
-
-Creates a new grievance.
-
-Fields:
-
-- Citizen ID
-- Title
-- Description
-- Category
-- Location
-- Priority
-
----
-
-### View Grievances
-
-Displays all grievances.
-
-Columns:
-
-- ID
-- Citizen ID
-- Title
-- Category
-- Priority
-- Status
-- SLA Status
-
----
-
-### Dashboard
-
-Displays grievance statistics.
-
-- Total
-- Submitted
-- Assigned
-- In Progress
-- Resolved
-- Closed
-- Escalated
-- Overdue
-
----
-
-## ▶️ Getting Started
-
-Clone the repository
-
-```bash
-git clone <repository-url>
-```
-
-Navigate into the project
-
-```bash
-cd civicpulse-frontend
-```
-
-Install dependencies
-
-```bash
-npm install
-```
-
-Run the application
-
-```bash
-npm run dev
-```
-
-Application runs at
-
-```
-http://localhost:5173
-```
-
----
-
-## ⚙️ Prerequisites
-
-Ensure the following services are running:
+## Database
 
 - PostgreSQL
-- Eureka Discovery Server
-- API Gateway
-- User Service
-- Citizen Service
-- Grievance Service
-- Kafka
+
+## Security
+
 - Keycloak
+- OAuth2
+- JWT
+
+## Messaging
+
+- Apache Kafka
+
+## Service Discovery
+
+- Netflix Eureka
+
+## DevOps
+
+- Docker
 
 ---
 
-## 📌 Future Enhancements
+# Implemented Modules
 
-- JWT Authentication using Keycloak
+## Authentication
+
+- User Login
+- JWT Authentication
+- Role Management
+- Secure API Access
+
+---
+
+## Citizen Management
+
+- Citizen Registration
+- Citizen Profile
+- Citizen Listing
+
+---
+
+## Grievance Management
+
+### Citizen
+
+- Register Grievance
+- View Grievances
+- Track Status
+
+### Officer
+
+- Manage Assigned Complaints
+- Update Complaint Status
+
+### Admin
+
+- Monitor Complaints
+- Dashboard Overview
+
+---
+
+## Certificate Management
+
+Implemented Workflow
+
+```
+Citizen
+      │
+Apply Certificate
+      │
+Upload Documents
+      │
+Officer Verification
+      │
+Approval / Rejection
+      │
+Certificate Generation
+```
+
+Supported Certificates
+
+- Birth Certificate
+- Income Certificate
+- Residence Certificate
+- Death Certificate
+
+---
+
+## Permit Management
+
+Implemented Workflow
+
+```
+Citizen
+      │
+Apply Permit
+      │
+Verification
+      │
+Approval
+      │
+Permit Generation
+```
+
+Supported Permits
+
+- Trade License
+- Business Permit
+- Building Permit
+- Utility Permit
+
+---
+
+# Welfare Management
+
+## Welfare Scheme Management
+
+Implemented
+
+- Create Scheme
+- View Schemes
+- Update Scheme
+- Delete Scheme *(Currently under debugging)*
+
+Each Scheme Includes
+
+- Scheme Name
+- Department
+- Description
+- Eligibility Criteria
+- Benefit Amount
+- Status
+- Start Date
+- End Date
+
+---
+
+## Welfare Applications
+
+Implemented
+
+- Citizen Welfare Applications
+- Officer Approval
+- Officer Rejection
+- Application Status Tracking
+
+Workflow
+
+```
+Citizen
+     │
+Apply
+     │
+Eligibility Verification
+     │
+Officer Review
+     │
+Approval
+     │
+Beneficiary Registration
+```
+
+---
+
+## Beneficiary Management
+
+Implemented
+
+- Beneficiary Registration
+- Beneficiary Listing
+- Citizen-wise Beneficiaries
+- Scheme-wise Beneficiaries
+
+---
+
+# Budget Management
+
+Implemented
+
+- Budget Creation
+- Budget Update
+- Budget Deletion
+- Department Budgets
+- Budget Dashboard
+- Remaining Budget Calculation
+- Budget Utilization
+
+---
+
+# Budget Allocation
+
+Implemented
+
+- Allocate Budget to Welfare Schemes
+- Remaining Allocation Calculation
+- Allocation Listing
+
+---
+
+# Expense Management
+
+Implemented
+
+- Record Expenses
+- Department Expenses
+- Expense Categories
+- Expense History
+
+---
+
+# Fund Distribution
+
+Implemented
+
+- Welfare Fund Distribution
+- Beneficiary Payments
+- Payment Status
+- Distribution History
+
+---
+
+# Analytics Dashboard
+
+Implemented
+
+Dashboard includes
+
+- Total Budget
+- Utilized Budget
+- Remaining Budget
+- Budget Utilization %
+- Total Expenses
+- Total Payments
+- Completed Payments
+- Pending Payments
+- Failed Payments
+- Department Statistics
+
+---
+
+# Audit Monitoring
+
+Implemented
+
+- Audit Logs
+- Entity Tracking
+- Administrative Actions
+- Financial Operations
+- Compliance Monitoring
+
+---
+
+# Event-Driven Architecture
+
+Apache Kafka is used for asynchronous communication.
+
+Implemented Events
+
+- Grievance Created
+- Grievance Assigned
+- Grievance Status Updated
+- Grievance Escalated
+- Citizen Events
+
+---
+
+# Frontend
+
+Implemented React Pages
+
+### Authentication
+
+- Login
+
+### Citizen
+
+- Dashboard
+- Register Citizen
+- Register Grievance
+- My Grievances
+- Apply Certificate
+- Apply Permit
+- My Applications
+- Upload Documents
+- Track Application
+
+### Officer
+
+- Dashboard
+- Verification
+- Approval
+
+### Admin
+
+- Dashboard
+- Welfare Schemes
+- Welfare Applications
+- Beneficiaries
+- Budgets
+- Budget Allocation
+- Expenses
+- Fund Distribution
+- Analytics Dashboard
+- Audit Logs
+
+---
+
+# Current Status
+
+## Completed
+
+- Microservices Architecture
+- API Gateway
+- Eureka Discovery
+- Keycloak Authentication
+- JWT Security
+- Citizen Module
+- Grievance Module
+- Certificate Module
+- Permit Module
+- Welfare Module
+- Budget Module
+- Expense Module
+- Fund Distribution Module
+- Analytics Dashboard
+- Audit Monitoring
+- React Frontend Integration
+
+---
+
+## In Progress
+
+- Final Integration Testing
+- Welfare Scheme Delete Debugging
+- UI Enhancements
+
+---
+
+# Future Enhancements
+
+- AI-based Complaint Classification
+- Predictive Governance Analytics
+- Mobile Application
+- GIS Complaint Mapping
+- Blockchain Document Verification
+- Email Notifications
+- SMS Notifications
+- Redis Caching
+- CI/CD Deployment Pipeline
+
+---
+
+# Project Highlights
+
+- Enterprise Microservices Architecture
+- Secure Authentication using Keycloak
+- Event-Driven Communication with Kafka
+- RESTful APIs
 - Role-Based Access Control
-- Officer Dashboard
-- Department Management
-- Notification Module
-- Complaint Tracking Timeline
-- File Upload Support
-- Search & Filtering
-- Pagination
-- Responsive Dashboard Charts
+- Cloud-Native Design
+- Real-Time Analytics
+- Financial Transparency
+- Digital Governance Platform
 
 ---
 
-## 👨‍💻 Developed By
+# Developer
 
 **Jishnu V**
 
-Computer Science Engineering Student
+Backend-Focused Software Engineer
 
-Spring Boot | React | Microservices | Java
+**Tech Stack**
+
+- Java
+- Spring Boot
+- React
+- PostgreSQL
+- Kafka
+- Keycloak
+- Docker
+- Microservices
 
 ---
+
+## License
+
+This project is developed independently by **Jishnu V** as a personal software engineering and smart governance portfolio project.

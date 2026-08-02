@@ -10,4 +10,6 @@ public interface BeneficiaryRepository extends JpaRepository<Beneficiary, Long> 
     List<Beneficiary> findByCitizenId(Long citizenId);
 
     List<Beneficiary> findBySchemeId(Long schemeId);
+
+    boolean existsByCitizenId(Long citizenId);
 }
