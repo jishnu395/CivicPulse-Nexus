@@ -1,6 +1,6 @@
 # CivicPulse Nexus
 
-> A cloud-native Smart Governance platform built as a **solo full-stack project** using **Spring Boot Microservices**, **React**, **PostgreSQL**, **Kafka**, **Keycloak**, and **Docker** to digitize citizen services and improve transparency, accountability, and operational efficiency in government administration.
+> A cloud-native Smart Governance platform built as a **Java full-stack project** using **Spring Boot Microservices**, **React**, **PostgreSQL**, **Kafka**, **Keycloak**, and **Docker** to digitize citizen services and improve transparency, accountability, and operational efficiency in government administration.
 
 ---
 
