@@ -17,84 +17,45 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
 
-                        // Swagger
+                        // Swagger & Actuator
                         .requestMatchers(
                                 "/swagger-ui/**",
-                                "/v3/api-docs/**"
+                                "/v3/api-docs/**",
+                                "/actuator/**"
                         ).permitAll()
 
-                        // =========================
+                        // Stats & Dashboard for reporting & discovery
+                        .requestMatchers(HttpMethod.GET, "/api/dashboard/**").permitAll()
+
                         // Citizen APIs
-                        // =========================
-                        .requestMatchers(HttpMethod.GET, "/api/certificates/**")
-                        .hasAnyRole("CITIZEN", "OFFICER", "COMMISSIONER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/certificates/**").hasAnyRole("CITIZEN", "OFFICER", "COMMISSIONER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/certificates/**").hasAnyRole("CITIZEN", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/permits/**", "/api/permit/**").hasAnyRole("CITIZEN", "OFFICER", "COMMISSIONER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/permits/**", "/api/permit/**").hasAnyRole("CITIZEN", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/applications/**").hasAnyRole("CITIZEN", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/applications/**").hasAnyRole("CITIZEN", "OFFICER", "COMMISSIONER", "ADMIN")
 
-                        .requestMatchers(HttpMethod.POST, "/api/certificates/**")
-                        .hasAnyRole("CITIZEN", "ADMIN")
-
-                        // =========================
                         // Document APIs
-                        // =========================
-                        .requestMatchers("/api/documents/**")
-                        .hasAnyRole("CITIZEN", "OFFICER", "ADMIN")
+                        .requestMatchers("/api/documents/**").hasAnyRole("CITIZEN", "OFFICER", "ADMIN")
 
-                        // =========================
                         // Verification Officer
-                        // =========================
-                        .requestMatchers("/api/officer/pending")
-                        .hasAnyRole("OFFICER", "COMMISSIONER", "ADMIN")
+                        .requestMatchers("/api/officer/pending").hasAnyRole("OFFICER", "COMMISSIONER", "ADMIN")
+                        .requestMatchers("/api/officer/documents/**").hasAnyRole("OFFICER", "COMMISSIONER", "ADMIN")
+                        .requestMatchers("/api/officer/verify/**").hasAnyRole("OFFICER", "ADMIN")
+                        .requestMatchers("/api/officer/document/**").hasAnyRole("OFFICER", "ADMIN")
 
-                        // View uploaded documents
-                        .requestMatchers("/api/officer/documents/**")
-                        .hasAnyRole("OFFICER", "COMMISSIONER", "ADMIN")
-
-                        // Verify application
-                        .requestMatchers("/api/officer/verify/**")
-                        .hasAnyRole("OFFICER", "ADMIN")
-
-                        // Verify individual document
-                        .requestMatchers("/api/officer/document/**")
-                        .hasAnyRole("OFFICER", "ADMIN")
-
-                        // =========================
                         // Commissioner
-                        // =========================
-                        .requestMatchers("/api/officer/approve/**")
-                        .hasAnyRole("COMMISSIONER", "ADMIN")
+                        .requestMatchers("/api/officer/approve/**").hasAnyRole("COMMISSIONER", "ADMIN")
+                        .requestMatchers("/api/officer/reject/**").hasAnyRole("COMMISSIONER", "ADMIN")
 
-                        .requestMatchers("/api/officer/reject/**")
-                        .hasAnyRole("COMMISSIONER", "ADMIN")
+                        // Certificate & Permit Generation
+                        .requestMatchers("/api/certificate/generate/**", "/api/permit/generate/**").hasAnyRole("COMMISSIONER", "ADMIN")
+                        .requestMatchers("/api/certificate/download/**", "/api/permit/download/**").hasAnyRole("CITIZEN", "COMMISSIONER", "ADMIN")
 
-                        // =========================
-                        // Certificate Generation
-                        // =========================
-                        .requestMatchers("/api/certificate/generate/**")
-                        .hasAnyRole("COMMISSIONER", "ADMIN")
-
-                        // Certificate Download
-                        .requestMatchers("/api/certificate/download/**")
-                        .hasAnyRole("CITIZEN", "COMMISSIONER", "ADMIN")
-
-                        // =========================
-                        // Admin Dashboard
-                        // =========================
-                        .requestMatchers("/api/dashboard/**")
-                        .hasRole("ADMIN")
-
-                        // =========================
                         // Static Files
-                        // =========================
-                        .requestMatchers("/certificates/**")
-                        .permitAll()
+                        .requestMatchers("/certificates/**", "/permits/**", "/uploads/**").permitAll()
 
-                        .requestMatchers("/uploads/**")
-                        .permitAll()
-
-                        // =========================
-                        // All Other Requests
-                        // =========================
-                        .anyRequest()
-                        .authenticated()
+                        .anyRequest().authenticated()
                 )
 
                 .oauth2ResourceServer(oauth ->

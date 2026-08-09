@@ -48,7 +48,7 @@ public class GrievanceController {
     }
 
     @Operation(summary = "Get grievance by ID")
-    @PreAuthorize("hasAnyRole('ADMIN','OFFICER','COMMISSIONER')")
+    @PreAuthorize("hasAnyRole('ADMIN','OFFICER','COMMISSIONER','CITIZEN')")
     @GetMapping("/{id}")
     public ResponseEntity<GrievanceResponse> getGrievanceById(
             @PathVariable Long id) {
@@ -57,7 +57,7 @@ public class GrievanceController {
     }
 
     @Operation(summary = "Get grievances by Citizen ID")
-    @PreAuthorize("hasAnyRole('ADMIN','OFFICER','COMMISSIONER')")
+    @PreAuthorize("hasAnyRole('ADMIN','OFFICER','COMMISSIONER','CITIZEN')")
     @GetMapping("/citizen/{citizenId}")
     public ResponseEntity<List<GrievanceResponse>> getGrievancesByCitizenId(
             @PathVariable Long citizenId) {
@@ -126,7 +126,7 @@ public class GrievanceController {
     )
     @ApiResponse(responseCode = "200", description = "History retrieved successfully")
     @ApiResponse(responseCode = "404", description = "Grievance not found")
-    @PreAuthorize("hasAnyRole('ADMIN','OFFICER','COMMISSIONER')")
+    @PreAuthorize("hasAnyRole('ADMIN','OFFICER','COMMISSIONER','CITIZEN')")
     @GetMapping("/{id}/history")
     public ResponseEntity<List<GrievanceHistoryResponse>> getGrievanceHistory(
             @PathVariable Long id) {
@@ -136,12 +136,39 @@ public class GrievanceController {
     }
 
     @Operation(summary = "Dashboard")
-    @PreAuthorize("hasAnyRole('ADMIN','COMMISSIONER','OFFICER','CITIZEN')")
     @GetMapping("/dashboard")
     public ResponseEntity<GrievanceDashboardResponse> getDashboard() {
 
         return ResponseEntity.ok(
                 grievanceService.getDashboard());
+    }
+
+    @Operation(summary = "Get Grievance Statistics and SLA Analytics")
+    @GetMapping("/stats")
+    public ResponseEntity<GrievanceStatsResponse> getGrievanceStats() {
+
+        return ResponseEntity.ok(
+                grievanceService.getGrievanceStats());
+    }
+
+    @Operation(summary = "Submit Citizen Feedback for Resolved Grievance")
+    @PreAuthorize("hasRole('CITIZEN')")
+    @PostMapping("/{id}/feedback")
+    public ResponseEntity<FeedbackResponse> submitFeedback(
+            @PathVariable Long id,
+            @Valid @RequestBody CreateFeedbackRequest request) {
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(grievanceService.submitFeedback(id, request));
+    }
+
+    @Operation(summary = "Get Feedback for Grievance")
+    @GetMapping("/{id}/feedback")
+    public ResponseEntity<FeedbackResponse> getFeedback(
+            @PathVariable Long id) {
+
+        return ResponseEntity.ok(
+                grievanceService.getFeedback(id));
     }
 
     @Operation(summary = "My Grievances")

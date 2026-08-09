@@ -22,6 +22,11 @@ public class BeneficiaryController {
         return beneficiaryService.register(applicationId);
     }
 
+    @GetMapping("/{id}")
+    public BeneficiaryResponse getById(@PathVariable Long id) {
+        return beneficiaryService.getById(id);
+    }
+
     @GetMapping
     public List<BeneficiaryResponse> getAll() {
 

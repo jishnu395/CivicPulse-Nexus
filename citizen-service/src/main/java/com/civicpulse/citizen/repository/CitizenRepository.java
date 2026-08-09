@@ -1,9 +1,10 @@
 package com.civicpulse.citizen.repository;
 
-import com.civicpulse.citizen.dto.response.CitizenResponse;
 import com.civicpulse.citizen.entity.Citizen;
 import com.civicpulse.citizen.util.enums.CitizenStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -30,5 +31,13 @@ public interface CitizenRepository extends JpaRepository<Citizen, Long> {
 
     boolean existsByUserId(Long userId);
 
-    CitizenResponse getCitizenByEmail(String email);
+    long countByStatus(CitizenStatus status);
+
+    @Query("SELECT c FROM Citizen c WHERE " +
+            "LOWER(c.firstName) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+            "LOWER(c.lastName) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+            "LOWER(c.email) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+            "c.phoneNumber LIKE CONCAT('%', :query, '%') OR " +
+            "c.wardNumber LIKE CONCAT('%', :query, '%')")
+    List<Citizen> searchCitizens(@Param("query") String query);
 }

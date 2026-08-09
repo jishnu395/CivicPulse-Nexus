@@ -3,6 +3,7 @@ package com.civicpulse.citizen.controller;
 import com.civicpulse.citizen.dto.request.CreateCitizenRequest;
 import com.civicpulse.citizen.dto.request.UpdateCitizenRequest;
 import com.civicpulse.citizen.dto.response.CitizenResponse;
+import com.civicpulse.citizen.dto.response.CitizenStatsResponse;
 import com.civicpulse.citizen.service.interfaces.CitizenService;
 import com.civicpulse.citizen.util.enums.CitizenStatus;
 import io.swagger.v3.oas.annotations.Operation;
@@ -53,7 +54,6 @@ public class CitizenController {
     )
     @ApiResponse(responseCode = "200", description = "Citizen found")
     @ApiResponse(responseCode = "404", description = "Citizen not found")
-    @PreAuthorize("hasAnyRole('ADMIN','OFFICER','COMMISSIONER','CITIZEN')")
     @GetMapping("/{id}")
     public ResponseEntity<CitizenResponse> getCitizenById(
             @Parameter(description = "Citizen database ID")
@@ -68,12 +68,36 @@ public class CitizenController {
             description = "Returns a list of all registered citizens."
     )
     @ApiResponse(responseCode = "200", description = "Citizens retrieved successfully")
-    @PreAuthorize("hasAnyRole('ADMIN','OFFICER','COMMISSIONER')")
     @GetMapping
     public ResponseEntity<List<CitizenResponse>> getAllCitizens() {
 
         return ResponseEntity.ok(
                 citizenService.getAllCitizens());
+    }
+
+    @Operation(
+            summary = "Search citizens",
+            description = "Searches citizens by name, email, phone, or ward."
+    )
+    @ApiResponse(responseCode = "200", description = "Search results")
+    @GetMapping("/search")
+    public ResponseEntity<List<CitizenResponse>> searchCitizens(
+            @RequestParam(required = false) String query) {
+
+        return ResponseEntity.ok(
+                citizenService.searchCitizens(query));
+    }
+
+    @Operation(
+            summary = "Get citizen statistics",
+            description = "Aggregated citizen counts and ward distributions for analytics and reporting."
+    )
+    @ApiResponse(responseCode = "200", description = "Statistics retrieved successfully")
+    @GetMapping("/stats")
+    public ResponseEntity<CitizenStatsResponse> getCitizenStats() {
+
+        return ResponseEntity.ok(
+                citizenService.getCitizenStats());
     }
 
     @Operation(
@@ -115,7 +139,6 @@ public class CitizenController {
             description = "Returns all citizens belonging to a ward."
     )
     @ApiResponse(responseCode = "200", description = "Citizens retrieved successfully")
-    @PreAuthorize("hasAnyRole('ADMIN','OFFICER','COMMISSIONER')")
     @GetMapping("/ward/{wardNumber}")
     public ResponseEntity<List<CitizenResponse>> getCitizensByWard(
             @Parameter(description = "Ward number")
@@ -130,7 +153,6 @@ public class CitizenController {
             description = "Returns all citizens filtered by status."
     )
     @ApiResponse(responseCode = "200", description = "Citizens retrieved successfully")
-    @PreAuthorize("hasAnyRole('ADMIN','OFFICER','COMMISSIONER')")
     @GetMapping("/status/{status}")
     public ResponseEntity<List<CitizenResponse>> getCitizensByStatus(
             @Parameter(description = "Citizen status (ACTIVE, INACTIVE)")

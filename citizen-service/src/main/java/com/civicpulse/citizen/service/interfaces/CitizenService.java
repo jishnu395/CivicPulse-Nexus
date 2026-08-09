@@ -3,6 +3,7 @@ package com.civicpulse.citizen.service.interfaces;
 import com.civicpulse.citizen.dto.request.CreateCitizenRequest;
 import com.civicpulse.citizen.dto.request.UpdateCitizenRequest;
 import com.civicpulse.citizen.dto.response.CitizenResponse;
+import com.civicpulse.citizen.dto.response.CitizenStatsResponse;
 import com.civicpulse.citizen.util.enums.CitizenStatus;
 
 import java.util.List;
@@ -27,4 +28,8 @@ public interface CitizenService {
     CitizenResponse getCitizenByUserId(Long userId);
 
     CitizenResponse getCitizenByEmail(String email);
+
+    List<CitizenResponse> searchCitizens(String query);
+
+    CitizenStatsResponse getCitizenStats();
 }

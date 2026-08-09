@@ -29,20 +29,24 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
 
-                        // Swagger
+                        // Swagger & Actuator
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
-                                "/v3/api-docs/**"
+                                "/v3/api-docs/**",
+                                "/actuator/**"
                         ).permitAll()
 
-                        // Dashboard
-                        .requestMatchers(HttpMethod.GET, "/api/grievances/dashboard")
-                        .hasAnyRole("ADMIN", "COMMISSIONER", "OFFICER", "CITIZEN")
+                        // Stats & Dashboard for reporting & discovery
+                        .requestMatchers(HttpMethod.GET, "/api/grievances/stats").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/grievances/dashboard").permitAll()
 
                         // Create Grievance
-                        .requestMatchers(HttpMethod.POST, "/api/grievances")
-                        .hasRole("CITIZEN")
+                        .requestMatchers(HttpMethod.POST, "/api/grievances").hasRole("CITIZEN")
+
+                        // Feedback
+                        .requestMatchers(HttpMethod.POST, "/api/grievances/*/feedback").hasRole("CITIZEN")
+                        .requestMatchers(HttpMethod.GET, "/api/grievances/*/feedback").permitAll()
 
                         // View Grievances
                         .requestMatchers(HttpMethod.GET, "/api/grievances/**")

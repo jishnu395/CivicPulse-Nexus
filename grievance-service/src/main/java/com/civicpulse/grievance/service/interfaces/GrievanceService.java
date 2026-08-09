@@ -25,4 +25,10 @@ public interface GrievanceService {
     GrievanceDashboardResponse getDashboard();
 
     List<GrievanceResponse> getMyGrievances(String email);
+
+    FeedbackResponse submitFeedback(Long grievanceId, CreateFeedbackRequest request);
+
+    FeedbackResponse getFeedback(Long grievanceId);
+
+    GrievanceStatsResponse getGrievanceStats();
 }

@@ -8,6 +8,8 @@ public interface BeneficiaryService {
 
     BeneficiaryResponse register(Long applicationId);
 
+    BeneficiaryResponse getById(Long id);
+
     List<BeneficiaryResponse> getAll();
 
     List<BeneficiaryResponse> getByCitizen(Long citizenId);

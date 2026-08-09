@@ -2,7 +2,7 @@ package com.civicpulse.citizen.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -27,18 +27,19 @@ public class SecurityConfig {
 
         http
                 .csrf(AbstractHttpConfigurer::disable)
-
                 .authorizeHttpRequests(auth -> auth
-
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
-                                "/v3/api-docs/**"
+                                "/v3/api-docs/**",
+                                "/actuator/**"
                         ).permitAll()
-
+                        .requestMatchers(HttpMethod.GET, "/api/citizens/stats").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/citizens/{id}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/citizens/user/{userId}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/citizens/email/**").permitAll()
                         .anyRequest().authenticated()
                 )
-
                 .oauth2ResourceServer(oauth ->
                         oauth.jwt(jwt ->
                                 jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())

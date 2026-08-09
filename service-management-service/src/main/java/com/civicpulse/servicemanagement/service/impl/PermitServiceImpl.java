@@ -2,6 +2,7 @@ package com.civicpulse.servicemanagement.service.impl;
 
 import com.civicpulse.servicemanagement.dto.PermitResponse;
 import com.civicpulse.servicemanagement.entity.Application;
+import com.civicpulse.servicemanagement.entity.DownloadLog;
 import com.civicpulse.servicemanagement.entity.Permit;
 import com.civicpulse.servicemanagement.enums.ApplicationStatus;
 import com.civicpulse.servicemanagement.exception.BadRequestException;
@@ -9,8 +10,14 @@ import com.civicpulse.servicemanagement.exception.ResourceNotFoundException;
 import com.civicpulse.servicemanagement.kafka.ApplicationEventProducer;
 import com.civicpulse.servicemanagement.mapper.PermitMapper;
 import com.civicpulse.servicemanagement.repository.ApplicationRepository;
+import com.civicpulse.servicemanagement.repository.DownloadLogRepository;
 import com.civicpulse.servicemanagement.repository.PermitRepository;
 import com.civicpulse.servicemanagement.service.PermitService;
+import com.lowagie.text.Document;
+import com.lowagie.text.Font;
+import com.lowagie.text.FontFactory;
+import com.lowagie.text.Paragraph;
+import com.lowagie.text.pdf.PdfWriter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,18 +25,13 @@ import java.io.ByteArrayOutputStream;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import com.lowagie.text.Document;
-import com.lowagie.text.Font;
-import com.lowagie.text.FontFactory;
-import com.lowagie.text.Paragraph;
-import com.lowagie.text.pdf.PdfWriter;
-
 @Service
 @RequiredArgsConstructor
 public class PermitServiceImpl implements PermitService {
 
     private final PermitRepository permitRepository;
     private final ApplicationRepository applicationRepository;
+    private final DownloadLogRepository downloadLogRepository;
     private final PermitMapper permitMapper;
     private final ApplicationEventProducer eventProducer;
 
@@ -66,7 +68,7 @@ public class PermitServiceImpl implements PermitService {
         Permit permit = Permit.builder()
                 .permitNo(permitNo)
                 .issueDate(LocalDateTime.now())
-                .digitalSignature("DIGITAL-SIGNATURE")
+                .digitalSignature("DIGITAL-SIGNATURE-VERIFIED-CIVICPULSE")
                 .pdfUrl("/permits/" + permitNo + ".pdf")
                 .application(application)
                 .build();
@@ -92,6 +94,14 @@ public class PermitServiceImpl implements PermitService {
                         new ResourceNotFoundException(
                                 "Permit not found."));
 
+        downloadLogRepository.save(DownloadLog.builder()
+                .itemType("PERMIT")
+                .itemNumber(permit.getPermitNo())
+                .applicationId(applicationId)
+                .citizenId(permit.getApplication().getCitizenId())
+                .downloadedAt(LocalDateTime.now())
+                .build());
+
         return permitMapper.toResponse(permit);
     }
 
@@ -113,6 +123,14 @@ public class PermitServiceImpl implements PermitService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Permit not found."));
 
+        downloadLogRepository.save(DownloadLog.builder()
+                .itemType("PERMIT")
+                .itemNumber(permit.getPermitNo())
+                .applicationId(applicationId)
+                .citizenId(permit.getApplication().getCitizenId())
+                .downloadedAt(LocalDateTime.now())
+                .build());
+
         try {
 
             ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -130,13 +148,15 @@ public class PermitServiceImpl implements PermitService {
 
             document.add(new Paragraph("CIVICPULSE NEXUS", title));
             document.add(new Paragraph(" "));
-            document.add(new Paragraph("PERMIT"));
+            document.add(new Paragraph("OFFICIAL MUNICIPAL PERMIT / LICENSE"));
             document.add(new Paragraph(" "));
             document.add(new Paragraph("Permit Number : " + permit.getPermitNo()));
             document.add(new Paragraph("Issue Date : " + permit.getIssueDate()));
             document.add(new Paragraph("Application ID : " + permit.getApplication().getId()));
             document.add(new Paragraph("Permit Type : " + permit.getApplication().getPermitType()));
             document.add(new Paragraph("Department : " + permit.getApplication().getDepartment()));
+            document.add(new Paragraph("Citizen ID : " + permit.getApplication().getCitizenId()));
+            document.add(new Paragraph("Fee Status : PAID ($" + permit.getApplication().getFeeAmount() + ")"));
             document.add(new Paragraph("Digital Signature : " + permit.getDigitalSignature()));
 
             document.close();

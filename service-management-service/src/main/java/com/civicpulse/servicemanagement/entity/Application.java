@@ -24,30 +24,41 @@ public class Application {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "application_no", nullable = false, unique = true)
     private String applicationNo;
 
-    @Column(nullable = false)
+    @Column(name = "citizen_id", nullable = false)
     private Long citizenId;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "certificate_type")
     private CertificateType certificateType;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "permit_type")
     private PermitType permitType;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "department", nullable = false)
     private DepartmentType department;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "status", nullable = false)
     private ApplicationStatus status;
 
-    @Column(nullable = false)
+    @Column(name = "submission_date", nullable = false)
     private LocalDateTime submissionDate;
 
+    @Column(name = "approval_date")
     private LocalDateTime approvalDate;
+
+    @Column(name = "fee_amount", columnDefinition = "DOUBLE PRECISION DEFAULT 20.0")
+    @Builder.Default
+    private Double feeAmount = 20.0;
+
+    @Column(name = "payment_status", columnDefinition = "VARCHAR(255) DEFAULT 'PAID'")
+    @Builder.Default
+    private String paymentStatus = "PAID";
 
     @OneToMany(
             mappedBy = "application",
@@ -72,6 +83,6 @@ public class Application {
     )
     private Permit permit;
 
-    @Column(length = 1000)
+    @Column(name = "remarks", length = 1000)
     private String remarks;
 }

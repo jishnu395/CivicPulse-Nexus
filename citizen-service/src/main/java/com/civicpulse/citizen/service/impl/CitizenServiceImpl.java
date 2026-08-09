@@ -4,9 +4,12 @@ import com.civicpulse.citizen.client.service.UserClientService;
 import com.civicpulse.citizen.dto.request.CreateCitizenRequest;
 import com.civicpulse.citizen.dto.request.UpdateCitizenRequest;
 import com.civicpulse.citizen.dto.response.CitizenResponse;
+import com.civicpulse.citizen.dto.response.CitizenStatsResponse;
 import com.civicpulse.citizen.dto.response.UserResponse;
 import com.civicpulse.citizen.entity.Citizen;
 import com.civicpulse.citizen.event.CitizenCreatedEvent;
+import com.civicpulse.citizen.event.CitizenDeletedEvent;
+import com.civicpulse.citizen.event.CitizenUpdatedEvent;
 import com.civicpulse.citizen.exception.CitizenNotFoundException;
 import com.civicpulse.citizen.exception.DuplicateCitizenException;
 import com.civicpulse.citizen.mapper.CitizenMapper;
@@ -15,13 +18,12 @@ import com.civicpulse.citizen.repository.CitizenRepository;
 import com.civicpulse.citizen.service.interfaces.CitizenService;
 import com.civicpulse.citizen.util.enums.CitizenStatus;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -104,6 +106,19 @@ public class CitizenServiceImpl implements CitizenService {
 
         Citizen updatedCitizen = citizenRepository.save(citizen);
 
+        CitizenUpdatedEvent event = CitizenUpdatedEvent.builder()
+                .userId(updatedCitizen.getUserId())
+                .citizenId(updatedCitizen.getCitizenId())
+                .email(updatedCitizen.getEmail())
+                .firstName(updatedCitizen.getFirstName())
+                .lastName(updatedCitizen.getLastName())
+                .phoneNumber(updatedCitizen.getPhoneNumber())
+                .wardNumber(updatedCitizen.getWardNumber())
+                .updatedAt(LocalDateTime.now())
+                .build();
+
+        citizenEventProducer.publishCitizenUpdatedEvent(event);
+
         return citizenMapper.toResponse(updatedCitizen);
     }
 
@@ -118,6 +133,15 @@ public class CitizenServiceImpl implements CitizenService {
 
         citizen.setStatus(CitizenStatus.INACTIVE);
         citizenRepository.save(citizen);
+
+        CitizenDeletedEvent event = CitizenDeletedEvent.builder()
+                .id(citizen.getId())
+                .userId(citizen.getUserId())
+                .citizenId(citizen.getCitizenId())
+                .deletedAt(LocalDateTime.now())
+                .build();
+
+        citizenEventProducer.publishCitizenDeletedEvent(event);
     }
 
     @Override
@@ -142,7 +166,7 @@ public class CitizenServiceImpl implements CitizenService {
     public CitizenResponse getCitizenByUserId(Long userId) {
 
         Citizen citizen = citizenRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("Citizen not found"));
+                .orElseThrow(() -> new RuntimeException("Citizen not found for userId: " + userId));
 
         return citizenMapper.toResponse(citizen);
     }
@@ -152,8 +176,38 @@ public class CitizenServiceImpl implements CitizenService {
 
         Citizen citizen = citizenRepository.findByEmail(email)
                 .orElseThrow(() ->
-                        new CitizenNotFoundException("Citizen not found"));
+                        new CitizenNotFoundException("Citizen not found with email: " + email));
 
         return citizenMapper.toResponse(citizen);
+    }
+
+    @Override
+    public List<CitizenResponse> searchCitizens(String query) {
+        if (query == null || query.trim().isEmpty()) {
+            return getAllCitizens();
+        }
+        return citizenRepository.searchCitizens(query.trim())
+                .stream()
+                .map(citizenMapper::toResponse)
+                .toList();
+    }
+
+    @Override
+    public CitizenStatsResponse getCitizenStats() {
+        long total = citizenRepository.count();
+        long active = citizenRepository.countByStatus(CitizenStatus.ACTIVE);
+        long inactive = citizenRepository.countByStatus(CitizenStatus.INACTIVE);
+
+        Map<String, Long> wardMap = citizenRepository.findAll()
+                .stream()
+                .filter(c -> c.getWardNumber() != null)
+                .collect(Collectors.groupingBy(Citizen::getWardNumber, Collectors.counting()));
+
+        return CitizenStatsResponse.builder()
+                .totalCitizens(total)
+                .activeCitizens(active)
+                .inactiveCitizens(inactive)
+                .wardDistribution(wardMap)
+                .build();
     }
 }

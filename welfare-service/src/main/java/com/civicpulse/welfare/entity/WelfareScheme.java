@@ -28,7 +28,7 @@ public class WelfareScheme {
     @Column(nullable = false)
     private String department;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 1000)
     private String eligibilityCriteria;
 
     @Column(nullable = false)
@@ -43,4 +43,19 @@ public class WelfareScheme {
 
     @Column(nullable = false)
     private LocalDate endDate;
+
+    @Builder.Default
+    private Integer minAge = 0;
+
+    @Builder.Default
+    private Integer maxAge = 120;
+
+    @Builder.Default
+    private Double maxAnnualIncome = 1000000.0;
+
+    @Builder.Default
+    private String eligibleWards = "ALL";
+
+    @Builder.Default
+    private String requiredDocuments = "Aadhaar, Income Certificate";
 }

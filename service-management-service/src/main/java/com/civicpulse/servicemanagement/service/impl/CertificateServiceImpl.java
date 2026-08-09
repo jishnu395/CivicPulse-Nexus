@@ -3,6 +3,7 @@ package com.civicpulse.servicemanagement.service.impl;
 import com.civicpulse.servicemanagement.dto.CertificateResponse;
 import com.civicpulse.servicemanagement.entity.Application;
 import com.civicpulse.servicemanagement.entity.Certificate;
+import com.civicpulse.servicemanagement.entity.DownloadLog;
 import com.civicpulse.servicemanagement.enums.ApplicationStatus;
 import com.civicpulse.servicemanagement.exception.BadRequestException;
 import com.civicpulse.servicemanagement.exception.ResourceNotFoundException;
@@ -10,6 +11,7 @@ import com.civicpulse.servicemanagement.kafka.ApplicationEventProducer;
 import com.civicpulse.servicemanagement.mapper.CertificateMapper;
 import com.civicpulse.servicemanagement.repository.ApplicationRepository;
 import com.civicpulse.servicemanagement.repository.CertificateRepository;
+import com.civicpulse.servicemanagement.repository.DownloadLogRepository;
 import com.civicpulse.servicemanagement.service.CertificateService;
 import com.lowagie.text.Document;
 import com.lowagie.text.Font;
@@ -29,6 +31,7 @@ public class CertificateServiceImpl implements CertificateService {
 
     private final CertificateRepository certificateRepository;
     private final ApplicationRepository applicationRepository;
+    private final DownloadLogRepository downloadLogRepository;
     private final CertificateMapper certificateMapper;
     private final ApplicationEventProducer eventProducer;
 
@@ -60,7 +63,7 @@ public class CertificateServiceImpl implements CertificateService {
         Certificate certificate = Certificate.builder()
                 .certificateNo(certificateNo)
                 .issueDate(LocalDateTime.now())
-                .digitalSignature("DIGITAL-SIGNATURE")
+                .digitalSignature("DIGITAL-SIGNATURE-VERIFIED-CIVICPULSE")
                 .pdfUrl("/certificates/" + certificateNo + ".pdf")
                 .application(application)
                 .build();
@@ -95,6 +98,14 @@ public class CertificateServiceImpl implements CertificateService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Certificate not found."));
 
+        downloadLogRepository.save(DownloadLog.builder()
+                .itemType("CERTIFICATE")
+                .itemNumber(certificate.getCertificateNo())
+                .applicationId(applicationId)
+                .citizenId(certificate.getApplication().getCitizenId())
+                .downloadedAt(LocalDateTime.now())
+                .build());
+
         return certificateMapper.toResponse(certificate);
     }
 
@@ -104,6 +115,14 @@ public class CertificateServiceImpl implements CertificateService {
         Certificate certificate = certificateRepository.findByApplication_Id(applicationId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Certificate not found."));
+
+        downloadLogRepository.save(DownloadLog.builder()
+                .itemType("CERTIFICATE")
+                .itemNumber(certificate.getCertificateNo())
+                .applicationId(applicationId)
+                .citizenId(certificate.getApplication().getCitizenId())
+                .downloadedAt(LocalDateTime.now())
+                .build());
 
         try {
 
@@ -122,13 +141,15 @@ public class CertificateServiceImpl implements CertificateService {
 
             document.add(new Paragraph("CIVICPULSE NEXUS", title));
             document.add(new Paragraph(" "));
-            document.add(new Paragraph("CERTIFICATE"));
+            document.add(new Paragraph("OFFICIAL MUNICIPAL CERTIFICATE"));
             document.add(new Paragraph(" "));
             document.add(new Paragraph("Certificate Number : " + certificate.getCertificateNo()));
             document.add(new Paragraph("Issue Date : " + certificate.getIssueDate()));
             document.add(new Paragraph("Application ID : " + certificate.getApplication().getId()));
             document.add(new Paragraph("Certificate Type : " + certificate.getApplication().getCertificateType()));
             document.add(new Paragraph("Department : " + certificate.getApplication().getDepartment()));
+            document.add(new Paragraph("Citizen ID : " + certificate.getApplication().getCitizenId()));
+            document.add(new Paragraph("Fee Status : PAID ($" + certificate.getApplication().getFeeAmount() + ")"));
             document.add(new Paragraph("Digital Signature : " + certificate.getDigitalSignature()));
 
             document.close();

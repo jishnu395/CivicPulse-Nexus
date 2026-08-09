@@ -2,7 +2,9 @@ package com.civicpulse.grievance.service.impl;
 
 import com.civicpulse.grievance.dto.*;
 import com.civicpulse.grievance.entity.Grievance;
+import com.civicpulse.grievance.entity.GrievanceFeedback;
 import com.civicpulse.grievance.enums.GrievanceStatus;
+import com.civicpulse.grievance.enums.Priority;
 import com.civicpulse.grievance.enums.SLAStatus;
 import com.civicpulse.grievance.exception.GrievanceNotFoundException;
 import com.civicpulse.grievance.exception.InvalidGrievanceStatusException;
@@ -12,6 +14,7 @@ import com.civicpulse.grievance.kafka.event.GrievanceCreatedEvent;
 import com.civicpulse.grievance.kafka.event.GrievanceStatusUpdatedEvent;
 import com.civicpulse.grievance.kafka.producer.GrievanceEventProducer;
 import com.civicpulse.grievance.mapper.GrievanceMapper;
+import com.civicpulse.grievance.repository.GrievanceFeedbackRepository;
 import com.civicpulse.grievance.repository.GrievanceRepository;
 import com.civicpulse.grievance.service.interfaces.GrievanceHistoryService;
 import com.civicpulse.grievance.service.interfaces.GrievanceService;
@@ -25,6 +28,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +40,7 @@ public class GrievanceServiceImpl implements GrievanceService {
             LoggerFactory.getLogger(GrievanceServiceImpl.class);
 
     private final GrievanceRepository grievanceRepository;
+    private final GrievanceFeedbackRepository feedbackRepository;
     private final GrievanceMapper grievanceMapper;
     private final CitizenClient citizenClient;
     private final GrievanceEventProducer grievanceEventProducer;
@@ -384,4 +390,109 @@ public class GrievanceServiceImpl implements GrievanceService {
         return response;
     }
 
+    @Override
+    public FeedbackResponse submitFeedback(Long grievanceId, CreateFeedbackRequest request) {
+
+        Grievance grievance = grievanceRepository.findById(grievanceId)
+                .orElseThrow(() -> new GrievanceNotFoundException("Grievance not found with id: " + grievanceId));
+
+        if (grievance.getStatus() != GrievanceStatus.RESOLVED && grievance.getStatus() != GrievanceStatus.CLOSED) {
+            throw new IllegalStateException("Feedback can only be submitted for RESOLVED or CLOSED grievances.");
+        }
+
+        if (feedbackRepository.existsByGrievanceId(grievanceId)) {
+            throw new IllegalStateException("Feedback has already been submitted for this grievance.");
+        }
+
+        GrievanceFeedback feedback = GrievanceFeedback.builder()
+                .grievanceId(grievanceId)
+                .citizenId(request.getCitizenId())
+                .rating(request.getRating())
+                .comments(request.getComments())
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        GrievanceFeedback saved = feedbackRepository.save(feedback);
+
+        return FeedbackResponse.builder()
+                .id(saved.getId())
+                .grievanceId(saved.getGrievanceId())
+                .citizenId(saved.getCitizenId())
+                .rating(saved.getRating())
+                .comments(saved.getComments())
+                .createdAt(saved.getCreatedAt())
+                .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public FeedbackResponse getFeedback(Long grievanceId) {
+        GrievanceFeedback feedback = feedbackRepository.findByGrievanceId(grievanceId)
+                .orElseThrow(() -> new GrievanceNotFoundException("No feedback found for grievance ID: " + grievanceId));
+
+        return FeedbackResponse.builder()
+                .id(feedback.getId())
+                .grievanceId(feedback.getGrievanceId())
+                .citizenId(feedback.getCitizenId())
+                .rating(feedback.getRating())
+                .comments(feedback.getComments())
+                .createdAt(feedback.getCreatedAt())
+                .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public GrievanceStatsResponse getGrievanceStats() {
+        long total = grievanceRepository.count();
+        long submitted = grievanceRepository.countByStatus(GrievanceStatus.SUBMITTED);
+        long assigned = grievanceRepository.countByStatus(GrievanceStatus.ASSIGNED);
+        long inProgress = grievanceRepository.countByStatus(GrievanceStatus.IN_PROGRESS);
+        long pending = grievanceRepository.countByStatus(GrievanceStatus.PENDING);
+        long resolved = grievanceRepository.countByStatus(GrievanceStatus.RESOLVED);
+        long closed = grievanceRepository.countByStatus(GrievanceStatus.CLOSED);
+        long escalated = grievanceRepository.countByStatus(GrievanceStatus.ESCALATED);
+        long overdue = grievanceRepository.countBySlaStatus(SLAStatus.OVERDUE);
+
+        double resolutionRate = 0.0;
+        if (total > 0) {
+            resolutionRate = Math.round(((double) (resolved + closed) / total) * 10000.0) / 100.0;
+        }
+
+        long withinSla = grievanceRepository.countBySlaStatus(SLAStatus.WITHIN_SLA);
+        double slaRate = 0.0;
+        if (total > 0) {
+            slaRate = Math.round(((double) withinSla / total) * 10000.0) / 100.0;
+        }
+
+        Double avgRating = feedbackRepository.getAverageRating();
+        double satisfactionScore = avgRating != null ? Math.round(avgRating * 10.0) / 10.0 : 0.0;
+        long feedbackCount = feedbackRepository.count();
+
+        List<Grievance> all = grievanceRepository.findAll();
+        Map<String, Long> categoryMap = all.stream()
+                .filter(g -> g.getCategory() != null)
+                .collect(Collectors.groupingBy(Grievance::getCategory, Collectors.counting()));
+
+        Map<String, Long> priorityMap = all.stream()
+                .filter(g -> g.getPriority() != null)
+                .collect(Collectors.groupingBy(g -> g.getPriority().name(), Collectors.counting()));
+
+        return GrievanceStatsResponse.builder()
+                .totalGrievances(total)
+                .submitted(submitted)
+                .assigned(assigned)
+                .inProgress(inProgress)
+                .pending(pending)
+                .resolved(resolved)
+                .closed(closed)
+                .escalated(escalated)
+                .overdue(overdue)
+                .resolutionRate(resolutionRate)
+                .slaComplianceRate(slaRate)
+                .averageSatisfactionRating(satisfactionScore)
+                .totalFeedbackCount(feedbackCount)
+                .categoryDistribution(categoryMap)
+                .priorityDistribution(priorityMap)
+                .build();
+    }
 }

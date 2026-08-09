@@ -2,8 +2,10 @@ package com.civicpulse.budget.controller;
 
 import com.civicpulse.budget.dto.request.CreateBudgetRequest;
 import com.civicpulse.budget.dto.request.UpdateBudgetRequest;
+import com.civicpulse.budget.dto.response.AnalyticsDashboardResponse;
 import com.civicpulse.budget.dto.response.BudgetDashboardResponse;
 import com.civicpulse.budget.dto.response.BudgetResponse;
+import com.civicpulse.budget.service.AnalyticsService;
 import com.civicpulse.budget.service.BudgetService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,7 @@ import java.util.List;
 public class BudgetController {
 
     private final BudgetService budgetService;
+    private final AnalyticsService analyticsService;
 
     // Create Budget
     @PostMapping
@@ -79,5 +82,11 @@ public class BudgetController {
     public BudgetDashboardResponse dashboard() {
 
         return budgetService.dashboard();
+    }
+
+    // Complete Analytics & Stats for Reporting
+    @GetMapping("/stats")
+    public AnalyticsDashboardResponse stats() {
+        return analyticsService.dashboard();
     }
 }

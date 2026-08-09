@@ -21,9 +21,7 @@ import java.util.List;
 public class BeneficiaryServiceImpl implements BeneficiaryService {
 
     private final BeneficiaryRepository beneficiaryRepository;
-
     private final WelfareApplicationRepository applicationRepository;
-
     private final BeneficiaryMapper beneficiaryMapper;
 
     @Override
@@ -32,16 +30,20 @@ public class BeneficiaryServiceImpl implements BeneficiaryService {
         WelfareApplication application =
                 applicationRepository.findById(applicationId)
                         .orElseThrow(() ->
-                                new ResourceNotFoundException("Application not found."));
+                                new ResourceNotFoundException("Application not found with id: " + applicationId));
 
         if (application.getStatus() != ApplicationStatus.APPROVED) {
-            throw new RuntimeException("Application is not approved.");
+            throw new RuntimeException("Application must be approved before beneficiary enrollment.");
         }
 
         WelfareScheme scheme = application.getWelfareScheme();
 
         if (scheme == null) {
-            throw new ResourceNotFoundException("Scheme not found.");
+            throw new ResourceNotFoundException("Scheme not found for this application.");
+        }
+
+        if (beneficiaryRepository.existsByCitizenIdAndSchemeId(application.getCitizenId(), scheme.getId())) {
+            throw new IllegalStateException("Beneficiary already enrolled for this scheme.");
         }
 
         Beneficiary beneficiary =
@@ -57,6 +59,14 @@ public class BeneficiaryServiceImpl implements BeneficiaryService {
         return beneficiaryMapper.toResponse(
                 beneficiaryRepository.save(beneficiary)
         );
+    }
+
+    @Override
+    public BeneficiaryResponse getById(Long id) {
+        Beneficiary beneficiary = beneficiaryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Beneficiary not found with ID: " + id));
+
+        return beneficiaryMapper.toResponse(beneficiary);
     }
 
     @Override
