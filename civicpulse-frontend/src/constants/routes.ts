@@ -12,8 +12,14 @@ export const ROUTES = {
   CITIZEN_RAISE_GRIEVANCE: '/grievances/new',
   CITIZEN_GRIEVANCE_DETAILS: '/grievances/:id',
 
-  // Staff routes (Milestone 1)
+  // Citizen routes (Milestone 2 - Certificates & Permits)
+  SERVICE_APPLY: '/services/apply',
+  SERVICE_APPLICATIONS: '/services/applications',
+  SERVICE_APPLICATION_DETAILS: '/services/applications/:id',
+
+  // Staff routes (Milestone 1 & 2)
   STAFF_GRIEVANCES: '/grievances',
   STAFF_GRIEVANCE_DETAILS: '/grievances/:id',
   STAFF_CITIZENS: '/citizens',
+  STAFF_APPLICATIONS: '/staff/applications',
 };

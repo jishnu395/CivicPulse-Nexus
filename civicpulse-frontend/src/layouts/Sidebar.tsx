@@ -20,6 +20,8 @@ import {
   FiPlusCircle,
   FiUsers,
   FiAward,
+  FiFileText,
+  FiCheckSquare,
 } from 'react-icons/fi';
 
 interface SidebarProps {
@@ -42,21 +44,26 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, onMobileClose }) =
     { label: 'Dashboard', path: ROUTES.CITIZEN_DASHBOARD, icon: <FiHome /> },
     { label: 'My Grievances', path: '/grievances', icon: <FiAlertCircle /> },
     { label: 'Raise Grievance', path: '/grievances/new', icon: <FiPlusCircle /> },
+    { label: 'Apply for Service', path: ROUTES.SERVICE_APPLY, icon: <FiFileText /> },
+    { label: 'My Applications', path: ROUTES.SERVICE_APPLICATIONS, icon: <FiCheckSquare /> },
     { label: 'My Profile', path: ROUTES.CITIZEN_PROFILE, icon: <FiUser /> },
   ];
 
   const getOfficerNav = (): NavItem[] => [
     { label: 'Grievance Management', path: '/grievances', icon: <FiAlertCircle /> },
+    { label: 'Application Verification', path: ROUTES.STAFF_APPLICATIONS, icon: <FiCheckSquare /> },
     { label: 'Citizen Directory', path: '/citizens', icon: <FiUsers /> },
   ];
 
   const getCommissionerNav = (): NavItem[] => [
     { label: 'Grievance Oversight', path: '/grievances', icon: <FiAlertCircle /> },
+    { label: 'Application Approvals', path: ROUTES.STAFF_APPLICATIONS, icon: <FiCheckSquare /> },
     { label: 'Citizen Directory', path: '/citizens', icon: <FiUsers /> },
   ];
 
   const getAdminNav = (): NavItem[] => [
     { label: 'Grievance Control', path: '/grievances', icon: <FiAlertCircle /> },
+    { label: 'Applications Workbench', path: ROUTES.STAFF_APPLICATIONS, icon: <FiCheckSquare /> },
     { label: 'Citizen Directory', path: '/citizens', icon: <FiUsers /> },
   ];
 
@@ -164,7 +171,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, onMobileClose }) =
 
       <Box sx={{ p: 2, borderTop: '1px solid #f1f5f9', backgroundColor: '#f8fafc' }}>
         <Typography variant="body2" sx={{ fontSize: '0.6875rem', color: '#94a3b8', textAlign: 'center' }}>
-          CivicPulse Nexus (Milestone 1)
+          CivicPulse Nexus (Milestones 1 & 2)
         </Typography>
       </Box>
     </Box>

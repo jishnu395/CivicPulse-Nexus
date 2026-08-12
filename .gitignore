@@ -29,3 +29,5 @@ out/
 **/application.properties
 
 scratch_docs/
+# Runtime uploaded documents
+service-management-service/uploads/

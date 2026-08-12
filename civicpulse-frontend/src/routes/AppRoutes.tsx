@@ -23,6 +23,12 @@ import GrievanceListPage from '../pages/grievance/GrievanceListPage';
 import GrievanceDetailPage from '../pages/grievance/GrievanceDetailPage';
 import CitizenListPage from '../pages/admin/CitizenListPage';
 
+// Milestone 2 Pages
+import { ApplyServicePage } from '../pages/service/ApplyServicePage';
+import { MyApplicationsPage } from '../pages/service/MyApplicationsPage';
+import { ApplicationDetailPage } from '../pages/service/ApplicationDetailPage';
+import { OfficerApplicationsPage } from '../pages/service/OfficerApplicationsPage';
+
 export const AppRoutes: React.FC = () => {
   const { isAuthenticated, getDashboardRoute } = useAuth();
 
@@ -47,7 +53,7 @@ export const AppRoutes: React.FC = () => {
         <Route path={ROUTES.UNAUTHORIZED} element={<UnauthorizedPage />} />
       </Route>
 
-      {/* Authenticated Application routes (Milestone 1) */}
+      {/* Authenticated Application routes (Milestones 1 & 2) */}
       <Route
         element={
           <ProtectedRoute>
@@ -101,6 +107,46 @@ export const AppRoutes: React.FC = () => {
           element={
             <RoleGuard allowedRoles={['CITIZEN', 'OFFICER', 'COMMISSIONER', 'ADMIN']}>
               <GrievanceDetailPage />
+            </RoleGuard>
+          }
+        />
+
+        {/* CITIZEN Milestone 2: Apply for Certificate / Permit */}
+        <Route
+          path={ROUTES.SERVICE_APPLY}
+          element={
+            <RoleGuard allowedRoles={['CITIZEN', 'ADMIN']}>
+              <ApplyServicePage />
+            </RoleGuard>
+          }
+        />
+
+        {/* CITIZEN Milestone 2: My Applications */}
+        <Route
+          path={ROUTES.SERVICE_APPLICATIONS}
+          element={
+            <RoleGuard allowedRoles={['CITIZEN', 'ADMIN']}>
+              <MyApplicationsPage />
+            </RoleGuard>
+          }
+        />
+
+        {/* SHARED Milestone 2: Application Details */}
+        <Route
+          path={ROUTES.SERVICE_APPLICATION_DETAILS}
+          element={
+            <RoleGuard allowedRoles={['CITIZEN', 'OFFICER', 'COMMISSIONER', 'ADMIN']}>
+              <ApplicationDetailPage />
+            </RoleGuard>
+          }
+        />
+
+        {/* STAFF Milestone 2: Officer Verification & Approval Workbench */}
+        <Route
+          path={ROUTES.STAFF_APPLICATIONS}
+          element={
+            <RoleGuard allowedRoles={['OFFICER', 'COMMISSIONER', 'ADMIN']}>
+              <OfficerApplicationsPage />
             </RoleGuard>
           }
         />
