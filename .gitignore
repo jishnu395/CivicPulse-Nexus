@@ -27,3 +27,5 @@ out/
 
 # Application properties (contains passwords/secrets)
 **/application.properties
+
+scratch_docs/

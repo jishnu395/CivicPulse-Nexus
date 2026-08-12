@@ -56,11 +56,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       case 'CITIZEN':
         return ROUTES.CITIZEN_DASHBOARD;
       case 'OFFICER':
-        return ROUTES.OFFICER_DASHBOARD;
       case 'COMMISSIONER':
-        return ROUTES.COMMISSIONER_DASHBOARD;
       case 'ADMIN':
-        return ROUTES.ADMIN_DASHBOARD;
+        return '/grievances';
       default:
         return ROUTES.LOGIN;
     }
@@ -74,10 +72,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setCitizenProfile(response.data);
       }
     } catch {
-      // Citizen profile might not be completed yet, ignore error
+      // Citizen profile might not be completed yet
       setCitizenProfile(null);
     }
   }, []);
+
+  const refreshCitizenProfile = useCallback(async () => {
+    if (user?.id) {
+      await loadCitizenProfile(user.id);
+    }
+  }, [user?.id, loadCitizenProfile]);
 
   // Initialize auth state
   useEffect(() => {
@@ -196,9 +200,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       login,
       logout,
       setCitizenProfile,
+      refreshCitizenProfile,
       getDashboardRoute: () => getDashboardRouteForRole(role),
     }),
-    [accessToken, refreshToken, user, role, citizenProfile, isLoading, getDashboardRouteForRole]
+    [accessToken, refreshToken, user, role, citizenProfile, isLoading, refreshCitizenProfile, getDashboardRouteForRole]
   );
 
   return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;

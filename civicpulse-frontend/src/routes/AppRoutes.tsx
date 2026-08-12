@@ -15,12 +15,13 @@ import RegisterPage from '../pages/auth/RegisterPage';
 import UnauthorizedPage from '../pages/public/UnauthorizedPage';
 import NotFoundPage from '../pages/public/NotFoundPage';
 
-// Dashboards
+// Milestone 1 Pages
 import CitizenDashboard from '../pages/citizen/CitizenDashboard';
-import OfficerDashboard from '../pages/officer/OfficerDashboard';
-import CommissionerDashboard from '../pages/commissioner/CommissionerDashboard';
-import AdminDashboard from '../pages/admin/AdminDashboard';
-import ExecutiveDashboardPage from '../pages/reports/ExecutiveDashboardPage';
+import CitizenProfilePage from '../pages/citizen/CitizenProfilePage';
+import RaiseGrievancePage from '../pages/citizen/RaiseGrievancePage';
+import GrievanceListPage from '../pages/grievance/GrievanceListPage';
+import GrievanceDetailPage from '../pages/grievance/GrievanceDetailPage';
+import CitizenListPage from '../pages/admin/CitizenListPage';
 
 export const AppRoutes: React.FC = () => {
   const { isAuthenticated, getDashboardRoute } = useAuth();
@@ -46,7 +47,7 @@ export const AppRoutes: React.FC = () => {
         <Route path={ROUTES.UNAUTHORIZED} element={<UnauthorizedPage />} />
       </Route>
 
-      {/* Authenticated Application routes */}
+      {/* Authenticated Application routes (Milestone 1) */}
       <Route
         element={
           <ProtectedRoute>
@@ -54,7 +55,7 @@ export const AppRoutes: React.FC = () => {
           </ProtectedRoute>
         }
       >
-        {/* CITIZEN Routes */}
+        {/* CITIZEN Dashboard */}
         <Route
           path={ROUTES.CITIZEN_DASHBOARD}
           element={
@@ -63,347 +64,53 @@ export const AppRoutes: React.FC = () => {
             </RoleGuard>
           }
         />
+
+        {/* CITIZEN Profile */}
         <Route
           path={ROUTES.CITIZEN_PROFILE}
           element={
             <RoleGuard allowedRoles={['CITIZEN']}>
-              <CitizenDashboard />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path={ROUTES.CITIZEN_GRIEVANCES}
-          element={
-            <RoleGuard allowedRoles={['CITIZEN']}>
-              <CitizenDashboard />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path={ROUTES.CITIZEN_RAISE_GRIEVANCE}
-          element={
-            <RoleGuard allowedRoles={['CITIZEN']}>
-              <CitizenDashboard />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path={ROUTES.CITIZEN_CERTIFICATES}
-          element={
-            <RoleGuard allowedRoles={['CITIZEN']}>
-              <CitizenDashboard />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path={ROUTES.CITIZEN_PERMITS}
-          element={
-            <RoleGuard allowedRoles={['CITIZEN']}>
-              <CitizenDashboard />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path={ROUTES.CITIZEN_APPLICATIONS}
-          element={
-            <RoleGuard allowedRoles={['CITIZEN']}>
-              <CitizenDashboard />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path={ROUTES.CITIZEN_WELFARE}
-          element={
-            <RoleGuard allowedRoles={['CITIZEN']}>
-              <CitizenDashboard />
+              <CitizenProfilePage />
             </RoleGuard>
           }
         />
 
-        {/* OFFICER Routes */}
+        {/* CITIZEN Raise Grievance */}
         <Route
-          path={ROUTES.OFFICER_DASHBOARD}
+          path="/grievances/new"
           element={
-            <RoleGuard allowedRoles={['OFFICER', 'ADMIN']}>
-              <OfficerDashboard />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path={ROUTES.OFFICER_GRIEVANCES_ASSIGNED}
-          element={
-            <RoleGuard allowedRoles={['OFFICER', 'ADMIN']}>
-              <OfficerDashboard />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path={ROUTES.OFFICER_GRIEVANCES_PENDING}
-          element={
-            <RoleGuard allowedRoles={['OFFICER', 'ADMIN']}>
-              <OfficerDashboard />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path={ROUTES.OFFICER_GRIEVANCES_SLA}
-          element={
-            <RoleGuard allowedRoles={['OFFICER', 'ADMIN']}>
-              <OfficerDashboard />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path={ROUTES.OFFICER_GRIEVANCES_ESCALATED}
-          element={
-            <RoleGuard allowedRoles={['OFFICER', 'ADMIN']}>
-              <OfficerDashboard />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path={ROUTES.OFFICER_APPLICATIONS_VERIFICATION}
-          element={
-            <RoleGuard allowedRoles={['OFFICER', 'ADMIN']}>
-              <OfficerDashboard />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path={ROUTES.OFFICER_APPLICATIONS_APPROVALS}
-          element={
-            <RoleGuard allowedRoles={['OFFICER', 'ADMIN']}>
-              <OfficerDashboard />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path={ROUTES.OFFICER_WELFARE_APPLICATIONS}
-          element={
-            <RoleGuard allowedRoles={['OFFICER', 'ADMIN']}>
-              <OfficerDashboard />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path={ROUTES.OFFICER_WELFARE_BENEFICIARIES}
-          element={
-            <RoleGuard allowedRoles={['OFFICER', 'ADMIN']}>
-              <OfficerDashboard />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path={ROUTES.OFFICER_FUND_DISTRIBUTION}
-          element={
-            <RoleGuard allowedRoles={['OFFICER', 'ADMIN']}>
-              <OfficerDashboard />
+            <RoleGuard allowedRoles={['CITIZEN']}>
+              <RaiseGrievancePage />
             </RoleGuard>
           }
         />
 
-        {/* COMMISSIONER Routes */}
+        {/* SHARED Grievance List (Citizen & Staff) */}
         <Route
-          path={ROUTES.COMMISSIONER_DASHBOARD}
+          path="/grievances"
           element={
-            <RoleGuard allowedRoles={['COMMISSIONER', 'ADMIN']}>
-              <CommissionerDashboard />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path={ROUTES.COMMISSIONER_GRIEVANCES_MONITORING}
-          element={
-            <RoleGuard allowedRoles={['COMMISSIONER', 'ADMIN']}>
-              <CommissionerDashboard />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path={ROUTES.COMMISSIONER_GRIEVANCES_SLA}
-          element={
-            <RoleGuard allowedRoles={['COMMISSIONER', 'ADMIN']}>
-              <CommissionerDashboard />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path={ROUTES.COMMISSIONER_DEPARTMENT_PERFORMANCE}
-          element={
-            <RoleGuard allowedRoles={['COMMISSIONER', 'ADMIN']}>
-              <CommissionerDashboard />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path={ROUTES.COMMISSIONER_BUDGET}
-          element={
-            <RoleGuard allowedRoles={['COMMISSIONER', 'ADMIN']}>
-              <CommissionerDashboard />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path={ROUTES.COMMISSIONER_WELFARE}
-          element={
-            <RoleGuard allowedRoles={['COMMISSIONER', 'ADMIN']}>
-              <CommissionerDashboard />
+            <RoleGuard allowedRoles={['CITIZEN', 'OFFICER', 'COMMISSIONER', 'ADMIN']}>
+              <GrievanceListPage />
             </RoleGuard>
           }
         />
 
-        {/* ADMIN Routes */}
+        {/* SHARED Grievance Details (Citizen & Staff) */}
         <Route
-          path={ROUTES.ADMIN_DASHBOARD}
+          path="/grievances/:id"
           element={
-            <RoleGuard allowedRoles={['ADMIN']}>
-              <AdminDashboard />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path={ROUTES.ADMIN_USERS}
-          element={
-            <RoleGuard allowedRoles={['ADMIN']}>
-              <AdminDashboard />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path={ROUTES.ADMIN_CITIZENS}
-          element={
-            <RoleGuard allowedRoles={['ADMIN']}>
-              <AdminDashboard />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path={ROUTES.ADMIN_GRIEVANCES}
-          element={
-            <RoleGuard allowedRoles={['ADMIN']}>
-              <AdminDashboard />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path={ROUTES.ADMIN_CERTIFICATES}
-          element={
-            <RoleGuard allowedRoles={['ADMIN']}>
-              <AdminDashboard />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path={ROUTES.ADMIN_PERMITS}
-          element={
-            <RoleGuard allowedRoles={['ADMIN']}>
-              <AdminDashboard />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path={ROUTES.ADMIN_WELFARE}
-          element={
-            <RoleGuard allowedRoles={['ADMIN']}>
-              <AdminDashboard />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path={ROUTES.ADMIN_BUDGETS}
-          element={
-            <RoleGuard allowedRoles={['ADMIN']}>
-              <AdminDashboard />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path={ROUTES.ADMIN_ALLOCATIONS}
-          element={
-            <RoleGuard allowedRoles={['ADMIN']}>
-              <AdminDashboard />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path={ROUTES.ADMIN_EXPENSES}
-          element={
-            <RoleGuard allowedRoles={['ADMIN']}>
-              <AdminDashboard />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path={ROUTES.ADMIN_FUND_DISTRIBUTION}
-          element={
-            <RoleGuard allowedRoles={['ADMIN']}>
-              <AdminDashboard />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path={ROUTES.ADMIN_AUDIT}
-          element={
-            <RoleGuard allowedRoles={['ADMIN']}>
-              <AdminDashboard />
+            <RoleGuard allowedRoles={['CITIZEN', 'OFFICER', 'COMMISSIONER', 'ADMIN']}>
+              <GrievanceDetailPage />
             </RoleGuard>
           }
         />
 
-        {/* Milestone 4 Analytics Routes */}
+        {/* STAFF Citizen Directory & Demographics (Officer, Commissioner, Admin) */}
         <Route
-          path={ROUTES.ANALYTICS_EXECUTIVE}
+          path="/citizens"
           element={
-            <RoleGuard allowedRoles={['COMMISSIONER', 'ADMIN']}>
-              <ExecutiveDashboardPage />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path={ROUTES.ANALYTICS_CITIZENS}
-          element={
-            <RoleGuard allowedRoles={['COMMISSIONER', 'ADMIN']}>
-              <ExecutiveDashboardPage />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path={ROUTES.ANALYTICS_GRIEVANCES}
-          element={
-            <RoleGuard allowedRoles={['COMMISSIONER', 'ADMIN']}>
-              <ExecutiveDashboardPage />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path={ROUTES.ANALYTICS_REVENUE}
-          element={
-            <RoleGuard allowedRoles={['COMMISSIONER', 'ADMIN']}>
-              <ExecutiveDashboardPage />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path={ROUTES.ANALYTICS_BUDGET}
-          element={
-            <RoleGuard allowedRoles={['COMMISSIONER', 'ADMIN']}>
-              <ExecutiveDashboardPage />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path={ROUTES.ANALYTICS_DEPARTMENTS}
-          element={
-            <RoleGuard allowedRoles={['COMMISSIONER', 'ADMIN']}>
-              <ExecutiveDashboardPage />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path={ROUTES.ANALYTICS_SATISFACTION}
-          element={
-            <RoleGuard allowedRoles={['COMMISSIONER', 'ADMIN']}>
-              <ExecutiveDashboardPage />
+            <RoleGuard allowedRoles={['OFFICER', 'COMMISSIONER', 'ADMIN']}>
+              <CitizenListPage />
             </RoleGuard>
           }
         />

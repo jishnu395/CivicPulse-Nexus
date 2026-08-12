@@ -13,6 +13,7 @@ export interface AuthContextType {
   login: (credentials: LoginRequest) => Promise<LoginResponse>;
   logout: () => void;
   setCitizenProfile: (profile: Citizen | null) => void;
+  refreshCitizenProfile?: () => Promise<void>;
   getDashboardRoute: () => string;
 }
 
