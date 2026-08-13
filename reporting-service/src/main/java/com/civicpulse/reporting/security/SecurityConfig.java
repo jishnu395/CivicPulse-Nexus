@@ -22,7 +22,7 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/actuator/**"
                         ).permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/reports/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/reports/**").hasAnyRole("COMMISSIONER", "ADMIN")
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth ->

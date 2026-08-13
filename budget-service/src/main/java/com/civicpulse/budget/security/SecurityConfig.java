@@ -25,15 +25,26 @@ public class SecurityConfig {
                         // Reporting / analytics queries
                         .requestMatchers(HttpMethod.GET, "/api/budget/stats").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/analytics/**").hasAnyRole("ADMIN", "COMMISSIONER", "OFFICER")
-                        .requestMatchers(HttpMethod.GET, "/api/budgets/**").hasAnyRole("ADMIN", "COMMISSIONER", "OFFICER")
-                        .requestMatchers(HttpMethod.GET, "/api/allocations/**").hasAnyRole("ADMIN", "COMMISSIONER", "OFFICER")
-                        .requestMatchers(HttpMethod.GET, "/api/distributions/**").hasAnyRole("ADMIN", "COMMISSIONER", "OFFICER")
+                        
+                        // Budget & Allocation
+                        .requestMatchers(HttpMethod.GET, "/api/budget/**").hasAnyRole("ADMIN", "COMMISSIONER", "OFFICER")
+                        .requestMatchers(HttpMethod.POST, "/api/budget/**").hasAnyRole("ADMIN", "COMMISSIONER")
+                        .requestMatchers(HttpMethod.PUT, "/api/budget/**").hasAnyRole("ADMIN", "COMMISSIONER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/budget/**").hasAnyRole("ADMIN", "COMMISSIONER")
 
-                        // Modifications (Admin & Commissioner only)
-                        .requestMatchers(HttpMethod.POST, "/api/budgets/**").hasAnyRole("ADMIN", "COMMISSIONER")
-                        .requestMatchers(HttpMethod.PUT, "/api/budgets/**").hasAnyRole("ADMIN", "COMMISSIONER")
-                        .requestMatchers(HttpMethod.POST, "/api/allocations/**").hasAnyRole("ADMIN", "COMMISSIONER")
-                        .requestMatchers(HttpMethod.POST, "/api/distributions/**").hasAnyRole("ADMIN", "COMMISSIONER")
+                        // Expenses
+                        .requestMatchers(HttpMethod.GET, "/api/expenses/**").hasAnyRole("ADMIN", "COMMISSIONER", "OFFICER")
+                        .requestMatchers(HttpMethod.POST, "/api/expenses/**").hasAnyRole("ADMIN", "COMMISSIONER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/expenses/**").hasAnyRole("ADMIN", "COMMISSIONER")
+
+                        // Fund Distribution
+                        .requestMatchers(HttpMethod.GET, "/api/fund-distributions/citizen/**").hasAnyRole("CITIZEN", "ADMIN", "COMMISSIONER", "OFFICER")
+                        .requestMatchers(HttpMethod.GET, "/api/fund-distributions/**").hasAnyRole("ADMIN", "COMMISSIONER", "OFFICER")
+                        .requestMatchers(HttpMethod.POST, "/api/fund-distributions/**").hasAnyRole("ADMIN", "COMMISSIONER")
+                        .requestMatchers(HttpMethod.PUT, "/api/fund-distributions/**").hasAnyRole("ADMIN", "COMMISSIONER")
+
+                        // Audit Logs
+                        .requestMatchers(HttpMethod.GET, "/api/audit/**").hasAnyRole("ADMIN", "COMMISSIONER")
 
                         .anyRequest().authenticated()
                 )

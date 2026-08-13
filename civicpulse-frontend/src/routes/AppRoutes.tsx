@@ -29,6 +29,24 @@ import { MyApplicationsPage } from '../pages/service/MyApplicationsPage';
 import { ApplicationDetailPage } from '../pages/service/ApplicationDetailPage';
 import { OfficerApplicationsPage } from '../pages/service/OfficerApplicationsPage';
 
+// Milestone 3 Pages
+import WelfareSchemesPage from '../pages/welfare/WelfareSchemesPage';
+import ApplyWelfarePage from '../pages/welfare/ApplyWelfarePage';
+import MyWelfareApplicationsPage from '../pages/welfare/MyWelfareApplicationsPage';
+import WelfareManagementPage from '../pages/welfare/WelfareManagementPage';
+import BudgetDashboardPage from '../pages/budget/BudgetDashboardPage';
+import ExpenseManagementPage from '../pages/budget/ExpenseManagementPage';
+import FundDistributionPage from '../pages/budget/FundDistributionPage';
+import AuditLogsPage from '../pages/budget/AuditLogsPage';
+
+// Milestone 4 Pages
+import ExecutiveDashboardPage from '../pages/reporting/ExecutiveDashboardPage';
+import CitizenReportPage from '../pages/reporting/CitizenReportPage';
+import GrievanceReportPage from '../pages/reporting/GrievanceReportPage';
+import RevenueReportPage from '../pages/reporting/RevenueReportPage';
+import BudgetReportPage from '../pages/reporting/BudgetReportPage';
+import DepartmentPerformancePage from '../pages/reporting/DepartmentPerformancePage';
+
 export const AppRoutes: React.FC = () => {
   const { isAuthenticated, getDashboardRoute } = useAuth();
 
@@ -157,6 +175,146 @@ export const AppRoutes: React.FC = () => {
           element={
             <RoleGuard allowedRoles={['OFFICER', 'COMMISSIONER', 'ADMIN']}>
               <CitizenListPage />
+            </RoleGuard>
+          }
+        />
+
+        {/* CITIZEN Milestone 3: Welfare Schemes Catalog */}
+        <Route
+          path={ROUTES.WELFARE_SCHEMES}
+          element={
+            <RoleGuard allowedRoles={['CITIZEN']}>
+              <WelfareSchemesPage />
+            </RoleGuard>
+          }
+        />
+
+        {/* CITIZEN Milestone 3: Apply for Welfare Scheme */}
+        <Route
+          path={ROUTES.WELFARE_APPLY}
+          element={
+            <RoleGuard allowedRoles={['CITIZEN']}>
+              <ApplyWelfarePage />
+            </RoleGuard>
+          }
+        />
+
+        {/* CITIZEN Milestone 3: My Welfare Applications */}
+        <Route
+          path={ROUTES.WELFARE_APPLICATIONS}
+          element={
+            <RoleGuard allowedRoles={['CITIZEN']}>
+              <MyWelfareApplicationsPage />
+            </RoleGuard>
+          }
+        />
+
+        {/* STAFF Milestone 3: Welfare Schemes & Application Workbench */}
+        <Route
+          path={ROUTES.WELFARE_MANAGEMENT}
+          element={
+            <RoleGuard allowedRoles={['OFFICER', 'COMMISSIONER', 'ADMIN']}>
+              <WelfareManagementPage />
+            </RoleGuard>
+          }
+        />
+
+        {/* COMMISSIONER / ADMIN Milestone 3: Budget Dashboard */}
+        <Route
+          path={ROUTES.BUDGET_DASHBOARD}
+          element={
+            <RoleGuard allowedRoles={['COMMISSIONER', 'ADMIN']}>
+              <BudgetDashboardPage />
+            </RoleGuard>
+          }
+        />
+
+        {/* COMMISSIONER / ADMIN Milestone 3: Expense Management */}
+        <Route
+          path={ROUTES.EXPENSES}
+          element={
+            <RoleGuard allowedRoles={['COMMISSIONER', 'ADMIN']}>
+              <ExpenseManagementPage />
+            </RoleGuard>
+          }
+        />
+
+        {/* COMMISSIONER / ADMIN Milestone 3: Fund Distribution */}
+        <Route
+          path={ROUTES.FUND_DISTRIBUTIONS}
+          element={
+            <RoleGuard allowedRoles={['COMMISSIONER', 'ADMIN']}>
+              <FundDistributionPage />
+            </RoleGuard>
+          }
+        />
+
+        {/* COMMISSIONER / ADMIN Milestone 3: Financial Audit Logs */}
+        <Route
+          path={ROUTES.AUDIT_LOGS}
+          element={
+            <RoleGuard allowedRoles={['COMMISSIONER', 'ADMIN']}>
+              <AuditLogsPage />
+            </RoleGuard>
+          }
+        />
+
+        {/* COMMISSIONER / ADMIN Milestone 4: Executive Dashboard */}
+        <Route
+          path={ROUTES.REPORTING_DASHBOARD}
+          element={
+            <RoleGuard allowedRoles={['COMMISSIONER', 'ADMIN']}>
+              <ExecutiveDashboardPage />
+            </RoleGuard>
+          }
+        />
+
+        {/* COMMISSIONER / ADMIN Milestone 4: Citizen Report */}
+        <Route
+          path={ROUTES.REPORTING_CITIZENS}
+          element={
+            <RoleGuard allowedRoles={['COMMISSIONER', 'ADMIN']}>
+              <CitizenReportPage />
+            </RoleGuard>
+          }
+        />
+
+        {/* COMMISSIONER / ADMIN Milestone 4: Grievance Report */}
+        <Route
+          path={ROUTES.REPORTING_GRIEVANCES}
+          element={
+            <RoleGuard allowedRoles={['COMMISSIONER', 'ADMIN']}>
+              <GrievanceReportPage />
+            </RoleGuard>
+          }
+        />
+
+        {/* COMMISSIONER / ADMIN Milestone 4: Revenue Report */}
+        <Route
+          path={ROUTES.REPORTING_REVENUE}
+          element={
+            <RoleGuard allowedRoles={['COMMISSIONER', 'ADMIN']}>
+              <RevenueReportPage />
+            </RoleGuard>
+          }
+        />
+
+        {/* COMMISSIONER / ADMIN Milestone 4: Budget Report */}
+        <Route
+          path={ROUTES.REPORTING_BUDGET}
+          element={
+            <RoleGuard allowedRoles={['COMMISSIONER', 'ADMIN']}>
+              <BudgetReportPage />
+            </RoleGuard>
+          }
+        />
+
+        {/* COMMISSIONER / ADMIN Milestone 4: Department Performance */}
+        <Route
+          path={ROUTES.REPORTING_PERFORMANCE}
+          element={
+            <RoleGuard allowedRoles={['COMMISSIONER', 'ADMIN']}>
+              <DepartmentPerformancePage />
             </RoleGuard>
           }
         />
