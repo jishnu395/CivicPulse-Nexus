@@ -20,9 +20,11 @@ import { ROUTES } from '../../constants/routes';
 import { authApi } from '../../services/authApi';
 import apiClient from '../../services/api/client';
 import { toast } from 'react-toastify';
+import { useAuth } from '../../auth/useAuth';
 
 export const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
+  const { login, refreshCitizenProfile } = useAuth();
 
   const [activeStep, setActiveStep] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -70,6 +72,10 @@ export const RegisterPage: React.FC = () => {
       });
 
       setCreatedUserId(response.id);
+
+      // Authenticate newly registered user so Bearer token is saved in localStorage for Step 2
+      await login({ email, password });
+
       toast.success('Account created. Please complete your citizen profile.');
       setActiveStep(1);
     } catch (err: unknown) {
@@ -106,6 +112,10 @@ export const RegisterPage: React.FC = () => {
         state,
         postalCode,
       });
+
+      if (refreshCitizenProfile) {
+        await refreshCitizenProfile();
+      }
 
       toast.success('Citizen profile registered successfully!');
       setActiveStep(2);

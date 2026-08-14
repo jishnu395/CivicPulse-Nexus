@@ -279,7 +279,7 @@ export const GrievanceListPage: React.FC = () => {
                       <StatusChip status={g.status} />
                     </TableCell>
                     <TableCell>
-                      <SLAIndicator slaStatus={g.slaStatus} dueDate={g.dueDate} />
+                      <SLAIndicator slaStatus={g.slaStatus} status={g.status} dueDate={g.dueDate} />
                     </TableCell>
                     <TableCell>
                       <Typography variant="body2">
@@ -288,8 +288,8 @@ export const GrievanceListPage: React.FC = () => {
                     </TableCell>
                     <TableCell align="right" onClick={(e) => e.stopPropagation()}>
                       <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-                        {isCommissionerOrAdmin && g.status === 'SUBMITTED' && (
-                          <Tooltip title="Assign Department & Officer">
+                        {isCommissionerOrAdmin && g.status !== 'RESOLVED' && g.status !== 'CLOSED' && g.status !== 'REJECTED' && (
+                          <Tooltip title={g.assignedOfficerId ? "Reassign Department & Officer" : "Assign Department & Officer"}>
                             <IconButton
                               size="small"
                               color="primary"

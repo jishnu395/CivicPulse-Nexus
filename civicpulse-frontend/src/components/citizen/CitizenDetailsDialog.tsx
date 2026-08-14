@@ -139,7 +139,7 @@ export const CitizenDetailsDialog: React.FC<CitizenDetailsDialogProps> = ({
                     <TableCell>{g.category}</TableCell>
                     <TableCell><PriorityChip priority={g.priority} /></TableCell>
                     <TableCell><StatusChip status={g.status} /></TableCell>
-                    <TableCell><SLAIndicator slaStatus={g.slaStatus} dueDate={g.dueDate} /></TableCell>
+                    <TableCell><SLAIndicator slaStatus={g.slaStatus} status={g.status} dueDate={g.dueDate} /></TableCell>
                     <TableCell>{new Date(g.createdAt).toLocaleDateString()}</TableCell>
                   </TableRow>
                 ))}

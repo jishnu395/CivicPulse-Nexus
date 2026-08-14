@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -215,9 +216,20 @@ public class GrievanceServiceImpl implements GrievanceService {
                         new GrievanceNotFoundException(
                                 "Grievance not found with id : " + grievanceId));
 
-        if (grievance.getStatus() != GrievanceStatus.SUBMITTED) {
+        if (grievance.getStatus() == GrievanceStatus.RESOLVED ||
+            grievance.getStatus() == GrievanceStatus.CLOSED ||
+            grievance.getStatus() == GrievanceStatus.REJECTED) {
             throw new InvalidGrievanceStatusException(
-                    "Only SUBMITTED grievances can be assigned.");
+                    "Cannot assign or reassign a " + grievance.getStatus() + " grievance.");
+        }
+
+        Long oldOfficerId = grievance.getAssignedOfficerId();
+        Long oldDeptId = grievance.getDepartmentId();
+
+        // No-op check: if target department and officer are identical to current, return existing response without updating history or publishing Kafka event
+        if (Objects.equals(oldDeptId, request.getDepartmentId()) &&
+            Objects.equals(oldOfficerId, request.getAssignedOfficerId())) {
+            return grievanceMapper.toResponse(grievance);
         }
 
         grievance.setDepartmentId(request.getDepartmentId());
@@ -234,13 +246,20 @@ public class GrievanceServiceImpl implements GrievanceService {
 
         Grievance updated = grievanceRepository.save(grievance);
 
+        String historyDesc;
+        if (oldOfficerId != null) {
+            historyDesc = "Reassigned from Officer " + oldOfficerId + " to Officer " + updated.getAssignedOfficerId();
+            if (oldDeptId != null && !oldDeptId.equals(updated.getDepartmentId())) {
+                historyDesc += " (Department #" + oldDeptId + " -> #" + updated.getDepartmentId() + ")";
+            }
+        } else {
+            historyDesc = "Assigned to Department #" + updated.getDepartmentId() + " | Officer #" + updated.getAssignedOfficerId();
+        }
+
         grievanceHistoryService.saveHistory(
                 updated.getId(),
                 GrievanceStatus.ASSIGNED,
-                "Assigned to Department "
-                        + updated.getDepartmentId()
-                        + " | Officer "
-                        + updated.getAssignedOfficerId());
+                historyDesc);
 
         GrievanceAssignedEvent event = GrievanceAssignedEvent.builder()
                 .grievanceId(updated.getId())

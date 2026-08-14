@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -27,6 +27,8 @@ export const GrievanceAssignDialog: React.FC<GrievanceAssignDialogProps> = ({
   grievance,
   onSuccess,
 }) => {
+  const isReassign = Boolean(grievance.assignedOfficerId);
+
   const [departmentId, setDepartmentId] = useState<string>(
     grievance.departmentId ? String(grievance.departmentId) : '1'
   );
@@ -34,6 +36,13 @@ export const GrievanceAssignDialog: React.FC<GrievanceAssignDialogProps> = ({
     grievance.assignedOfficerId ? String(grievance.assignedOfficerId) : '1'
   );
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (grievance) {
+      setDepartmentId(grievance.departmentId ? String(grievance.departmentId) : '1');
+      setAssignedOfficerId(grievance.assignedOfficerId ? String(grievance.assignedOfficerId) : '1');
+    }
+  }, [grievance, open]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,12 +60,16 @@ export const GrievanceAssignDialog: React.FC<GrievanceAssignDialogProps> = ({
         departmentId: deptIdNum,
         assignedOfficerId: officerIdNum,
       });
-      toast.success(`Grievance successfully assigned to Department ${deptIdNum}`);
+      toast.success(
+        isReassign
+          ? `Grievance successfully reassigned to Department ${deptIdNum} | Officer ${officerIdNum}`
+          : `Grievance successfully assigned to Department ${deptIdNum} | Officer ${officerIdNum}`
+      );
       onSuccess(updated);
       onClose();
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
-      const message = error.response?.data?.message || 'Failed to assign grievance';
+      const message = error.response?.data?.message || (isReassign ? 'Failed to reassign grievance' : 'Failed to assign grievance');
       toast.error(message);
     } finally {
       setSubmitting(false);
@@ -67,12 +80,14 @@ export const GrievanceAssignDialog: React.FC<GrievanceAssignDialogProps> = ({
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
       <form onSubmit={handleSubmit}>
         <DialogTitle sx={{ pb: 1, fontWeight: 700 }}>
-          Assign Grievance
+          {isReassign ? 'Reassign Grievance' : 'Assign Grievance'}
         </DialogTitle>
         <DialogContent dividers>
           <Box sx={{ my: 1, display: 'flex', flexDirection: 'column', gap: 2.5 }}>
             <Typography variant="body2" color="text.secondary">
-              Assign this grievance to a municipal department and responsible field officer.
+              {isReassign
+                ? 'Reassign this grievance to another department or municipal field officer.'
+                : 'Assign this grievance to a municipal department and responsible field officer.'}
             </Typography>
 
             <TextField
@@ -106,7 +121,13 @@ export const GrievanceAssignDialog: React.FC<GrievanceAssignDialogProps> = ({
             disabled={submitting || !departmentId || !assignedOfficerId}
             startIcon={submitting ? <CircularProgress size={16} color="inherit" /> : null}
           >
-            {submitting ? 'Assigning...' : 'Assign Grievance'}
+            {submitting
+              ? isReassign
+                ? 'Reassigning...'
+                : 'Assigning...'
+              : isReassign
+              ? 'Reassign Grievance'
+              : 'Assign Grievance'}
           </Button>
         </DialogActions>
       </form>

@@ -146,14 +146,14 @@ export const GrievanceDetailPage: React.FC = () => {
               Back
             </Button>
 
-            {/* Commissioner/Admin Assignment */}
-            {isCommissionerOrAdmin && grievance.status === 'SUBMITTED' && (
+            {/* Commissioner/Admin Assignment / Reassignment */}
+            {isCommissionerOrAdmin && grievance.status !== 'RESOLVED' && grievance.status !== 'CLOSED' && grievance.status !== 'REJECTED' && (
               <Button
                 variant="contained"
                 startIcon={<FiUserPlus />}
                 onClick={() => setAssignDialogOpen(true)}
               >
-                Assign Officer
+                {grievance.assignedOfficerId ? 'Reassign Officer' : 'Assign Officer'}
               </Button>
             )}
 
@@ -193,7 +193,7 @@ export const GrievanceDetailPage: React.FC = () => {
                 <StatusChip status={grievance.status} size="medium" />
                 <PriorityChip priority={grievance.priority} size="medium" />
               </Box>
-              <SLAIndicator slaStatus={grievance.slaStatus} dueDate={grievance.dueDate} showCountdown size="medium" />
+              <SLAIndicator slaStatus={grievance.slaStatus} status={grievance.status} dueDate={grievance.dueDate} showCountdown size="medium" />
             </Box>
 
             <Divider sx={{ my: 2 }} />

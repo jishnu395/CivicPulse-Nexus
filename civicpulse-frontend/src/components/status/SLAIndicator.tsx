@@ -1,10 +1,11 @@
 import React from 'react';
 import { Chip, Tooltip, Box, Typography } from '@mui/material';
 import { FiCheckCircle, FiClock, FiAlertTriangle } from 'react-icons/fi';
-import { SLAStatus } from '../../types/grievance.types';
+import { GrievanceStatus, SLAStatus } from '../../types/grievance.types';
 
 interface SLAIndicatorProps {
   slaStatus: SLAStatus;
+  status?: GrievanceStatus;
   dueDate?: string;
   showCountdown?: boolean;
   size?: 'small' | 'medium';
@@ -12,12 +13,15 @@ interface SLAIndicatorProps {
 
 export const SLAIndicator: React.FC<SLAIndicatorProps> = ({
   slaStatus,
+  status,
   dueDate,
   showCountdown = false,
   size = 'small',
 }) => {
+  const isTerminal = status === 'RESOLVED' || status === 'CLOSED' || status === 'REJECTED';
+
   const getRemainingTime = (due?: string): string => {
-    if (!due) return '';
+    if (!due || isTerminal) return '';
     const now = new Date().getTime();
     const dueTime = new Date(due).getTime();
     const diffMs = dueTime - now;

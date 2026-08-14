@@ -64,10 +64,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  // Fetch citizen profile if citizen
-  const loadCitizenProfile = useCallback(async (userId: string | number) => {
+  // Fetch citizen profile if citizen (supports userId or email fallback)
+  const fetchCitizenProfile = useCallback(async (userId?: string | number, email?: string) => {
     try {
-      const response = await apiClient.get<Citizen>(`/api/citizens/user/${userId}`);
+      let endpoint = '';
+      if (userId !== undefined && userId !== null && String(userId).trim() !== '') {
+        endpoint = `/api/citizens/user/${userId}`;
+      } else if (email && email.trim() !== '') {
+        endpoint = `/api/citizens/email/${encodeURIComponent(email.trim())}`;
+      } else {
+        setCitizenProfile(null);
+        return;
+      }
+
+      const response = await apiClient.get<Citizen>(endpoint);
       if (response.data) {
         setCitizenProfile(response.data);
       }
@@ -78,10 +88,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const refreshCitizenProfile = useCallback(async () => {
-    if (user?.id) {
-      await loadCitizenProfile(user.id);
+    if (user?.id || user?.email) {
+      await fetchCitizenProfile(user.id, user.email);
     }
-  }, [user?.id, loadCitizenProfile]);
+  }, [user, fetchCitizenProfile]);
 
   // Initialize auth state
   useEffect(() => {
@@ -111,8 +121,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               localStorage.setItem('role', userRole);
             }
 
-            if (user?.id && userRole === 'CITIZEN') {
-              await loadCitizenProfile(user.id);
+            if ((user?.id || user?.email) && userRole === 'CITIZEN') {
+              await fetchCitizenProfile(user.id, user.email);
             }
           }
         } catch {
@@ -124,7 +134,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     initAuth();
-  }, [user?.id, role, loadCitizenProfile]);
+  }, [user, role, fetchCitizenProfile]);
 
   const login = async (credentials: LoginRequest): Promise<LoginResponse> => {
     setIsLoading(true);
@@ -156,18 +166,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       }
 
+      const newUser: User = data.user || { id: '', email: credentials.email, role: detectedRole };
+
       setAccessToken(token);
       setRefreshToken(data.refreshToken || null);
-      setUser(data.user || { id: '', email: credentials.email, role: detectedRole });
+      setUser(newUser);
       setRole(detectedRole);
 
       localStorage.setItem('accessToken', token);
       if (data.refreshToken) localStorage.setItem('refreshToken', data.refreshToken);
-      localStorage.setItem('user', JSON.stringify(data.user || { id: '', email: credentials.email, role: detectedRole }));
+      localStorage.setItem('user', JSON.stringify(newUser));
       localStorage.setItem('role', detectedRole);
 
-      if (detectedRole === 'CITIZEN' && data.user?.id) {
-        await loadCitizenProfile(data.user.id);
+      if (detectedRole === 'CITIZEN') {
+        await fetchCitizenProfile(newUser.id, credentials.email);
       }
 
       return data;
